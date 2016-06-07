@@ -1,10 +1,10 @@
+import sys
+sys.path.append("./PowerSupplyControl/")
 import powersupply
 import numpy as np
 import time
 
 
-
-# Setup the powersupply serial ports!
 
 # these two are for the horizontal field adustment 
 xCoil = powersupply.PowerSupply('/dev/tty.usbserial-FTBZ1G1B')
@@ -13,65 +13,52 @@ yCoil = powersupply.PowerSupply('/dev/tty.usbserial-FTBYZZIN')
 # this one stays locked at a value to keep the laser centered on the sensor
 zCoil = powersupply.PowerSupply('/dev/tty.usbserial-FTFBPHDT') # assign the correct port the the z powersupply
 
-
-# aproximate current values for zero field
-# x = 420
-# y = 354
-# z = 465
-
-# maximum is one amp
-
-
-# x and y field gain
-
-# x gain:  (milliamps per tesla)
-# y gain:  (milliamps per tesla)
-# z gain: 
-
-# for now we are going to just work in the current space
-
-currentMax = 800 
-currentMin = 0
-
-
-
-# set the z coil to be at it's nominal value:
-zCoil.current(465)
-
-
-
-# set the pendulum at a certin angle \theta
-
-
+# put the pendulum in it's starting position
 def set_angle(angle):
     
-    currentAmplitude = 400
-    currentOffset = 400
+    angleRad = np.radians(angle) # ((np.pi)/(180))*angle
     
-    xCoil.current( currentOffset + ((currentAmplitude * np.sin(angle)) )
-    yCoil.current( currentOffset + ((currentAmplitude * np.cos(angle)) )
+    currentAmplitude = 400
+    currentOffset = 401
+    
+    xCurrent = currentOffset + (currentAmplitude * np.sin(angleRad))
+    yCurrent = currentOffset + (currentAmplitude * np.cos(angleRad))
+
+    xCoil.current(xCurrent)
+    yCoil.current(yCurrent)
+
+    return
+
+###################################################
+
+startAngle = 50.00
+stopAngle = 50.05
+steps = 200
+
+
 
 # open the ports! 
 xCoil.openPort()
 yCoil.openPort()
+zCoil.openPort()
 
 
+# set the z coil to be at it's nominal value:
+zCoil.current(471)
 
 # reset the cois to zero position
-set_angle(0)
-print('sleeping for 5 seconds')
-time.sleep(5)
+set_angle(startAngle)
+print('sleeping for 3 seconds')
+time.sleep(3)
 
 # make the penduleum go in a circle (wind it up).
 
-angles = np.linspace(0,np.pi*2,2000)
-
 # circle one way
-
+angles = np.linspace(startAngle,stopAngle,steps)
 print('starting circle')
 for i in angles:
     set_angle(i)
-
+    print(i)
     
     
 # wait a bit
@@ -80,15 +67,16 @@ time.sleep(6)
 
 # circle is the other way
 print('other circle')
-angles = np.linspace(np.pi*2,0,2000)
+angles = np.linspace(stopAngle,startAngle,steps)
 
 for i in angles:
     set_angle(i)
     
-    
-print('done! and HI')
-
-# close the ports!
+# close the ports    
 xCoil.closePort()
 yCoil.closePort()
+zCoil.closePort()
 
+print('done! and HI')
+
+#def sweep(rads/second)
