@@ -66,8 +66,8 @@ def set_angle(angle, fieldStrength):
 ###################################################
 
 startAngle = 0
-stopAngle = 90
-steps = 200
+stopAngle = 360
+steps = 400
 maxField = 9e-6
 
 
