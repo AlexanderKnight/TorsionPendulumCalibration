@@ -3,7 +3,7 @@ sys.path.append("./PowerSupplyControl/")
 import powersupply
 import numpy as np
 import time
-
+#import uncertinties
 
 
 # these two are for the horizontal field adustment 
@@ -12,6 +12,21 @@ yCoil = powersupply.PowerSupply('/dev/tty.usbserial-FTBYZZIN')
 
 # this one stays locked at a value to keep the laser centered on the sensor
 zCoil = powersupply.PowerSupply('/dev/tty.usbserial-FTFBPHDT') # assign the correct port the the z powersupply
+
+# Coil gain calibration values:
+# X coil = 42.24 +- 0.08 uT/A
+# Y coil = 45.99 +- 0.09 uT/A
+# Z coil = 132.16 +- 0.08 uT/A
+
+xCoilGain = 42.24e-6 # T/A
+yCoilGain = 45.99e-6 # T/A
+zCoilGain = 132.16e-6 # T/A
+
+# Aproximate Earth field components:
+# x offset = 9.58 mT
+# y offset = 17.0 mT
+# z offset = -48.9 mT
+
 
 # put the pendulum in it's starting position
 def set_angle(angle):
@@ -44,7 +59,7 @@ zCoil.openPort()
 
 
 # set the z coil to be at it's nominal value:
-zCoil.current(471)
+zCoil.current(471.0)
 
 # reset the cois to zero position
 set_angle(startAngle)
