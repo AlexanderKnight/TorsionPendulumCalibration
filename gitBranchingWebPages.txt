@@ -1,0 +1,3 @@
+https://github.com/Kunena/Kunena-Forum/wiki/Create-a-new-branch-with-git-and-manage-branches
+
+http://stackoverflow.com/questions/5601931/best-and-safest-way-to-merge-a-git-branch-into-master 
