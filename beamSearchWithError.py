@@ -3,7 +3,7 @@ sys.path.append("./PowerSupplyControl/")
 import powersupply
 import numpy as np
 import time
-import uncertinties as u
+import uncertainties as u
 # import labjack library
 from labjack import ljm
 import matplotlib.pyplot as plt
@@ -21,22 +21,22 @@ xFieldGain = u.ufloat(42.24e-6, 0.08e-6) # T/A
 yFieldGain = u.ufloat(45.99e-6, 0.09e-6) # T/A
 zFieldGain = u.ufloat(132.16e-6, 0.08e-6) # T/A
 
-maxPowerSupplyCurrent = 999.9 #mA
-minPowerSupplyCurrent = 0.1 #mA
+maxPowerSupplyCurrent = 0.9999 #A
+minPowerSupplyCurrent = 0.0010 #A
 
 xFieldOffset = 13.883e-6 # T
 yFieldOffset = 13.883e-6 # T
 zFieldOffset = 48.9e-6 # T
 
 #Maximum possible field to be produced by coils
-xAppliedMaxField = xFieldGain * maxPowerSupplyCurrent*1e-3
-yAppliedMaxField = yFieldGain * maxPowerSupplyCurrent*1e-3
-zAppliedMaxField = zFieldGain * maxPowerSupplyCurrent*1e-3
+xAppliedMaxField = xFieldGain.n * maxPowerSupplyCurrent
+yAppliedMaxField = yFieldGain.n * maxPowerSupplyCurrent
+zAppliedMaxField = zFieldGain.n * maxPowerSupplyCurrent
 
 #minimum possible field to be produced by coils
-xAppliedMinField = xFieldGain * minPowerSupplyCurrent*1e-3
-yAppliedMinField = yFieldGain * minPowerSupplyCurrent*1e-3
-zAppliedMinField = zFieldGain * minPowerSupplyCurrent*1e-3
+xAppliedMinField = xFieldGain.n * minPowerSupplyCurrent
+yAppliedMinField = yFieldGain.n * minPowerSupplyCurrent
+zAppliedMinField = zFieldGain.n * minPowerSupplyCurrent
 
 #torsionalZero = 
 #torsionConstant = 
@@ -57,8 +57,8 @@ def field_polar(fieldMagnitude, fieldDirection):
     xCurrent = xField / xFieldGain
     yCurrent = yField / yFieldGain
     
-    xCoil.current(xCurrent.n) # set to the nominal value of the current
-    yCoil.current(yCurrent.n) # with the .n (from the uncertinties package)
+    xCoil.current(xCurrent.n*1e3) # set to the nominal value of the current
+    yCoil.current(yCurrent.n*1e3) # with the .n (from the uncertinties package)
     
     return
 
@@ -71,8 +71,9 @@ def field_cart(xField, yField):
     xCurrent = xField / xFieldGain
     yCurrent = yField / yFieldGain
     
-    xCoil.current(xCurrent.n) # set to the nominal value of the current
-    yCoil.current(yCurrent.n) # with the .n (from the uncertinties package)
+    print(xCurrent.n*1e3, yCurrent.n*1e3)
+    xCoil.current(xCurrent.n*1e3) # set to the nominal value of the current
+    yCoil.current(yCurrent.n*1e3) # with the .n (from the uncertinties package)
     
     return
     
@@ -92,36 +93,32 @@ print("Opened a LabJack with Device type: %i, Connection type: %i,\n" \
     (info[0], info[1], info[2], ljm.numberToIP(info[3]), info[4], info[5]))
 
 ##############
-Bx = np.linspace(xAppliedMinField, xAppliedMaxField, 200)
-By = np.linspace(yAppliedMinField, xAppliedMaxField, 200)
+steps = 100
+Bx = np.linspace(xAppliedMinField, xAppliedMaxField, steps)
+By = np.linspace(yAppliedMinField, yAppliedMaxField, steps)
 Bz = np.linspace(56.0, 62.0, 200)
 
 minSumSignal = 3.0
 
 sumSignal = []
 
-for i in range(len(bx)):
+for i in range(len(Bx)):
     if i % 2:
-        for y in By:
-            field_cart(Bx[i],y)
+        for j in range(len(By)):
+            field_cart(Bx[i],By[j])
             time.sleep(0.1)
             result = float(ljm.eReadName(handle,analogInputName))
             if result > minSumSignal:
-                sumSignal.append([Bx[i],y])
+                sumSignal.append([Bx[i],By[j]])
     else:
         
-        for y in By:
-            field_cart(Bx[-(i+1)],y)
+        for j in range(len(By)):
+            field_cart(Bx[i],By[-(j+1)])
             time.sleep(0.1)
             result = float(ljm.eReadName(handle,analogInputName))
             if result > minSumSignal:
-                sumSignal.append([Bx[-(i+1)],y])
+                sumSignal.append([Bx[i],By[-(j+1)]])
 
-for i in range(len(sumSignal)):
-    plt.scatter(sumSignal[i][0],sumSignal[i][1])
-plt.show()
-##############    
-    
 # close the labjack connection    
 ljm.close(handle)   
 
@@ -129,3 +126,16 @@ ljm.close(handle)
 xCoil.closePort()
 yCoil.closePort()
 zCoil.closePort()
+
+
+# plot the data
+
+# generate timestamp
+timeStamp = time.strftime('%m_%d_%y_%H_%M_%S')
+
+for i in range(len(sumSignal)):
+    plt.scatter(sumSignal[i][0],sumSignal[i][1])
+np.savetxt(timeStamp+'quadtrantSearchData.txt', sumSignal)
+plt.savefig(timeStamp + 'quadrantSearch.png')
+plt.show()
+##############    
