@@ -18,7 +18,7 @@ def set_field(coil, fieldValue, fieldGain):
     Field gain is in T/A so to get Amps we need to devide the field value by the field Gain
     """
     current = (fieldValue/fieldGain)*1e3 # set the current to be in milliamps
-    #print(current) 
+    print(current) 
     coil.current(current)
     return
                                                   
@@ -56,18 +56,18 @@ def set_angle(angle, fieldStrength):
     
     xField = xFieldOffset + (fieldStrength * np.sin(angleRad))
     yField = yFieldOffset + (fieldStrength * np.cos(angleRad))
-    
+    print(xField, yField)
     
     set_field(xCoil, xField, xCoilGain) # set the x field
     set_field(yCoil, yField, yCoilGain) # set the y field
     
-    return 
+    return
 
 ###################################################
 
-startAngle = 43.39
-stopAngle = 43.6
-steps = 100
+startAngle = 0
+stopAngle = 360
+steps = 400
 maxField = 13e-6
 
 
@@ -85,40 +85,15 @@ set_angle(startAngle, maxField) # maximum field value
 print('sleeping for 3 seconds')
 time.sleep(3)
 
+# make the penduleum go in a circle (wind it up).
 
-zSweep = np.linspace(436.4, 436.8, 5)
-for k in zSweep:
-    zCoil.current(k)
-    print('zcoil current = %s' % k)
-    # make the penduleum go in a circle (wind it up).
-    # circle one way
-    anglesUp = np.linspace(startAngle,stopAngle,steps)
-    print('starting circle')
-    for i in anglesUp:
-        set_angle(i, maxField)
-        print(i)
+try:
+    while True: # use a keyboard interupt to escape
+        set_angle(float(input('set angle to: ')), maxField)
+except:
+    # close the ports    
+    xCoil.closePort()
+    yCoil.closePort()
+    zCoil.closePort()
     
-    # sweep back to the start point
-    set_angle(startAngle, maxField)
-    time.sleep(2)
     
-    '''
-    # wait a bit
-    print('waiting')
-    time.sleep(2)
-
-    # circle is the other way
-    print('other circle')
-    anglesDown = np.linspace(stopAngle,startAngle,steps)
-
-    for i in anglesDown:
-        set_angle(i, maxField)
-        print(i)'''
-# close the ports    
-xCoil.closePort()
-yCoil.closePort()
-zCoil.closePort()
-
-print('done! and HI')
-
-#def sweep(rads/second)
