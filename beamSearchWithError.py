@@ -93,9 +93,9 @@ print("Opened a LabJack with Device type: %i, Connection type: %i,\n" \
     (info[0], info[1], info[2], ljm.numberToIP(info[3]), info[4], info[5]))
 
 ##############
-steps = 100
-Bx = np.linspace(xAppliedMinField, xAppliedMaxField, steps)
-By = np.linspace(yAppliedMinField, yAppliedMaxField, steps)
+steps = 1000
+Bx = np.linspace(xAppliedMinField, xAppliedMaxField, 40)
+By = np.linspace(yAppliedMinField, yAppliedMaxField, 1000)
 Bz = np.linspace(56.0, 62.0, 200)
 
 minSumSignal = 3.0
@@ -106,7 +106,7 @@ for i in range(len(Bx)):
     if i % 2:
         for j in range(len(By)):
             field_cart(Bx[i],By[j])
-            time.sleep(0.1)
+            #time.sleep(0.1)
             result = float(ljm.eReadName(handle,analogInputName))
             if result > minSumSignal:
                 sumSignal.append([Bx[i],By[j]])
@@ -114,7 +114,7 @@ for i in range(len(Bx)):
         
         for j in range(len(By)):
             field_cart(Bx[i],By[-(j+1)])
-            time.sleep(0.1)
+            #time.sleep(0.1)
             result = float(ljm.eReadName(handle,analogInputName))
             if result > minSumSignal:
                 sumSignal.append([Bx[i],By[-(j+1)]])
