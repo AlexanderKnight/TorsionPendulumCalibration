@@ -1,0 +1,27 @@
+Python 3.4.3 (default, Oct 14 2015, 20:28:29) 
+[GCC 4.8.4] on linux
+Type "copyright", "credits" or "license()" for more information.
+>>> import sympy
+>>> from sympy import Function, dsolve, Eq, Derivative, sin, cos, symbols
+>>> from sympy.abc import t, I, c, k, p, u, B, A, w, d
+
+>>> f = Function('f')
+
+>>> eq = I*f(t).diff(t,2) + c*f(t).diff(t,1) + k*p + k*f(t) + u*B*f(t) - u*A*f(t)*cos(w*t+d)
+
+>>> print(dsolve(eq))
+Traceback (most recent call last):
+  File "<pyshell#5>", line 1, in <module>
+    print(dsolve(eq))
+  File "/usr/local/lib/python3.4/dist-packages/sympy/solvers/ode.py", line 625, in dsolve
+    x0=x0, n=n, **kwargs)
+  File "/usr/local/lib/python3.4/dist-packages/sympy/solvers/deutils.py", line 235, in _desolve
+    raise NotImplementedError(dummy + "solve" + ": Cannot solve " + str(eq))
+NotImplementedError: solve: Cannot solve -A*u*f(t)*cos(d + t*w) + B*u*f(t) + I*Derivative(f(t), t, t) + c*Derivative(f(t), t) + k*p + k*f(t)
+
+
+>>> eq = I*f(t).diff(t,2) + c*f(t).diff(t,1) + k*p - k*f(t) + u*B*f(t) - u*A*cos(w*t+d)
+
+>>> dsolve(eq)
+Eq(f(t), A*B*u**2*cos(d + t*w)/(c**2*w**2 + (-B*u + I*w**2 + k)**2) - A*I*u*w**2*cos(d + t*w)/(c**2*w**2 + (-B*u + I*w**2 + k)**2) + A*c*u*w*sin(d + t*w)/(c**2*w**2 + (-B*u + I*w**2 + k)**2) - A*k*u*cos(d + t*w)/(c**2*w**2 + (-B*u + I*w**2 + k)**2) + C1*exp(t*(-c - sqrt(-4*B*I*u + 4*I*k + c**2))/(2*I)) + C2*exp(t*(-c + sqrt(-4*B*I*u + 4*I*k + c**2))/(2*I)) - k*p/(B*u - k))
+>>> 
