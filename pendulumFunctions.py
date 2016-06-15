@@ -46,7 +46,27 @@ zAppliedMinField = zFieldGain.n * minPowerSupplyCurrent
 #torsionalZero = 
 #torsionConstant = 
 
-def fine_field_cart(aFieldGain):
+# find what quadrent we are operating in
+FIELD_QUADRENT = 1 # can be a number between 1 and 4. 
+
+# adust the field gains to reflect our quadrent choice. 
+if FIELD_QUADRENT == 1:
+    # dont change the gain valus
+elif FIELD_QUADRENT == 2:
+    # swap the x gain
+    xFieldGain *= -1
+elif FIELD_QUADRENT == 3:
+    # swap both the x and y gain
+    xFieldGain *= -1
+    yFieldGain *= -1
+elif FIELD_QUADRENT == 4:
+    # just swap the y
+    yFieldGain *= -1
+else:
+    raise exception('bad FIELD_QUADRENT value. Should be an integer 1,2,3 or 4.')
+    
+
+def fine_field_cart(xField, yField):
     '''
     set the large and small coils to obtain a certin field value
     use the small coils with the labjack in command response mode.
