@@ -80,3 +80,5 @@ of the labjack.
         self.setSmallCoilField(self.smallFieldValue)
         self.fieldValue = fieldValue
         return
+        
+# now this will return the field value of the required to set the adustment coils. 
