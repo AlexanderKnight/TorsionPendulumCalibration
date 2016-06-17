@@ -1,8 +1,5 @@
-import numpy as np
-import time
 import uncertainties as u
 from labjack import ljm # import labjack library
-import matplotlib.pyplot as plt
 # now import the modules that we wrote
 import sys
 sys.path.append("./PowerSupplyControl/")
