@@ -80,5 +80,16 @@ of the labjack.
         self.setSmallCoilField(self.smallFieldValue)
         self.fieldValue = fieldValue
         return
-        
-# now this will return the field value of the required to set the adustment coils. 
+
+class SetOfHelmholtzCoils(object):
+    """docstring for SetOfHelmholtzCoils"""
+    def __init__(self, xCoil, yCoil, zCoil):
+
+
+    def set_field_cart(xField, yField):
+        '''
+        * calculate the desired currents for the powersupplies
+        * calculate the desired voltages for the labjack DAC's
+        * write to the powersupply to set the currents (in a seperate thread?)
+        * write to the labjack with eWriteNames
+        '''
