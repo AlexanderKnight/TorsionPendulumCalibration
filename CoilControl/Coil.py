@@ -1,14 +1,17 @@
+import sys
+sys.path.append("./../PowerSupplyControl/")
+import powersupply
 
 class Coil:
     '''
     parent class for a coil that is attached to a BK powersupply
     '''
-    def __init__(self, powersupplyAddress, largeFieldGain):
+    def __init__(self, powersupplyAddress, largeCoilFieldGain):
         # assign the correct port address to a powersupply objectsupply
         self.supply = powersupply.PowerSupply(powersupplyAdress)
 
         # calibration dependant data:
-        self.largeFieldGain = LargeFieldGain
+        self.largeCoilFieldGain = largeCoilFieldGain
         # power supply current command limits
         self.maxPowerSupplyCurrent = 0.9999 # A
         self.minPowerSupplyCurrent = 0.0010 # A
@@ -19,6 +22,7 @@ class Coil:
 
         # innitalize field value containers
         self.coilField = 0.0 # total field
+        self.largeCoilCurrent = 0.0
 
         return(self)
 
@@ -27,8 +31,12 @@ class Coil:
         Calculates the current required for the specified field.
         '''
         # calculate the current from the field value
-        current = fieldValue / self.largeFieldGain
-        self.supply.current(current) # make sure the current is in milliamps
+        current = fieldValue / self.largeCoilFieldGain
+        self.largeCoilCurrent = ('%5.1f' % current) # format the current the same way powersupply does
+        # with the formatted current we can recalculate the largeCoilField
+        self.largeCoilField = self.largeCoilCurrent * self.largeCoilfieldGain
+
+        self.supply.current(self.largeCoilCurrent) # make sure the current is in milliamps
         # update the stored value of the
 
         return
@@ -37,12 +45,12 @@ class CoilWithCorrection(Coil):
     '''
     coil with additional correction coil controlled by the labjack
     '''
-    def __init__(self, powersupplyAddress, largeFieldGain, labjackHandle, dacName, smallFieldGain):
+    def __init__(self, powersupplyAddress, largeCoilFieldGain, dacName, smallCoilFieldGain):
 
-        Coil.__init__(self, powersupplyAddress, largeFieldGain)
+        Coil.__init__(self, powersupplyAddress, largeCoilFieldGain)
 
         self.dacName = dacName # the DAC to which the adustment coil is conndected
-        self.smallFieldGain = smallFieldGain # T/A
+        self.smallCoilFieldGain = smallCoilFieldGain # T/A
         self.voltageGain = 250 # opAmp current source gain in (V/A)
         self.dacVoltage = 0.0 # store the voltage to write to the DAC
 
@@ -65,13 +73,17 @@ class CoilWithCorrection(Coil):
         be passed to the labjack with the other DAC setting to minimize comunication time
         '''
         self.smallFieldValue = fieldValue # update the field container
-        current = fieldValue / self.smallFieldGain # calculate the current from the field gain
-        self.dacVoltage = current * voltageGain # V = I*R
+        current = fieldValue / self.smallCoilFieldGain # calculate the current from the field gain
+        self.dacVoltage = current * self.voltageGain # V = I*R
 
     def setField(self, fieldValue):
-
+        '''
+        set both the small and large coils.
+        use the large coils to get in range of the desired value,
+        and the small ones to precisely set the field.
+        '''
         # calculate the smallest field that the large coil can produce
-        minimumLargeCoilFieldStep = self.minPowerSupplyCurrentStep * self.LargeFieldGain
+        minimumLargeCoilFieldStep = self.minPowerSupplyCurrentStep * self.largeCoilFieldGain
         # total range of the small coil.
         # |--|--|--|--|--|--|--|--| the small ticks are the minimumLargeCoilFieldStep
         #    |--|--|**|--|--|       this is the range of the dac after voltage clamping band
@@ -83,17 +95,30 @@ class CoilWithCorrection(Coil):
         largeCoilFieldOffset = minimumLargeCoilFieldStep * 3.5
         # the extra .5 above is to hack the rounding in the current function :P
         smallCoilFieldOffse = minimumLargeCoilFieldStep * 3.0
+
         # with this in mind let's split the field btween the large and small coils
         # the large coil is easy we just subtract the field offset and let the
-        # powersupply.PowerSupply.current() function round up or down with format
+        # powersupply.PowerSupply.current() function round up or down with format %5.1f
 
-        # for the small coil, we need to first provide the field offset but also
-        # calculate the remaining field (with mod) to get a precise measurement
-        smallCoilFieldRemainder = (fieldValue % minimumLargeCoilFieldStep)
+        # set the large coils only if we are out of range of the dacs
+        maximumChangeInField = largeCoilFieldOffset + smallCoilFieldRange
+        minimumChangeInField = largeCoilFieldOffset - smallCoilFieldRange
 
-        # set the large coil to the field value minus the field that we will add with the adustment coils
-        self.largeCoilField = (fieldValue - largeCoilFieldOffset)
-        # add the offset with the remainder to get the small field value.
-        self.smallCoilField = (smallCoilFieldOffset + smallCoilFieldRemainder)
+        self.smallFieldValue = (fieldValue - self.largeCoilField)
+
+        if self.smallFieldValue > maximumChangeInField or self.smallFieldValue < minimumChangeInField:
+            # renormalize!
+            # set the large coil to the field value minus the field that we will add with the adustment coils
+            self.setLargeCoilField(fieldValue - largeCoilFieldOffset)
+
+        # for the small coil, we need to first provide the field offset
+        # setLargeCoilField recalculates the true field contribution
+        # of the large coil so we can simply subtract that from our desired field value,
+        # and set the small coil field.
+        self.setSmallCoilField(fieldValue - self.largeCoilField)) 
+        # We do NOT want to run the labjack code here because its better to give
+        # it both coil values at once in the xyzFieldControl module.
+
+        self.coilField = fieldValue # update the total coil field for the next call
 
         return
