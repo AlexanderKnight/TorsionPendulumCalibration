@@ -58,7 +58,7 @@ def closePorts(handle):
     print('closed all three powersupplies')
 
     ljm.close(handle)
-    print(closed labjack)
+    print('closed labjack')
     return
 
 # define field setting functions

@@ -8,7 +8,7 @@ class Coil:
     '''
     def __init__(self, powersupplyAddress, largeCoilFieldGain):
         # assign the correct port address to a powersupply objectsupply
-        self.supply = powersupply.PowerSupply(powersupplyAdress)
+        self.supply = powersupply.PowerSupply(powersupplyAddress)
 
         # calibration dependant data:
         self.largeCoilFieldGain = largeCoilFieldGain
@@ -17,14 +17,14 @@ class Coil:
         self.minPowerSupplyCurrent = 0.0010 # A
 
         # Maximum and minimum possible field that can be produced by the coil.
-        self.appliedMaxField = fieldGain.n * maxPowerSupplyCurrent
-        self.appliedMinField = fieldGain.n * minPowerSupplyCurrent
+        self.appliedMaxField = self.largeCoilFieldGain.n * self.maxPowerSupplyCurrent
+        self.appliedMinField = self.largeCoilFieldGain.n * self.minPowerSupplyCurrent
 
         # innitalize field value containers
         self.coilField = 0.0 # total field
         self.largeCoilCurrent = 0.0
-
-        return(self)
+        
+        return
 
     def setLargeCoilField(self, fieldValue):
         '''
@@ -61,7 +61,7 @@ class CoilWithCorrection(Coil):
         self.largeCoilField = 0.0 # portion of the total field controlled by the large coils
         self.smallCoilField = 0.0 # portion of the total field for the small coils
 
-        return(self)
+        return
 
     def setSmallCoilField(self, fieldValue):
         '''
@@ -115,7 +115,7 @@ class CoilWithCorrection(Coil):
         # setLargeCoilField recalculates the true field contribution
         # of the large coil so we can simply subtract that from our desired field value,
         # and set the small coil field.
-        self.setSmallCoilField(fieldValue - self.largeCoilField)) 
+        self.setSmallCoilField(fieldValue - self.largeCoilField)
         # We do NOT want to run the labjack code here because its better to give
         # it both coil values at once in the xyzFieldControl module.
 
