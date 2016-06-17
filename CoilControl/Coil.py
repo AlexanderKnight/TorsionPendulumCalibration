@@ -33,9 +33,10 @@ class Coil:
         # calculate the current from the field value
         current = fieldValue / self.largeCoilFieldGain
         self.largeCoilCurrent = ('%5.1f' % current) # format the current the same way powersupply does
-        self.largeCoilField = self.largeCoilCurrent * self.fieldGain
+        # with the formatted current we can recalculate the largeCoilField
+        self.largeCoilField = self.largeCoilCurrent * self.largeCoilfieldGain
 
-        self.supply.current(current) # make sure the current is in milliamps
+        self.supply.current(self.largeCoilCurrent) # make sure the current is in milliamps
         # update the stored value of the
 
         return
@@ -73,7 +74,7 @@ class CoilWithCorrection(Coil):
         '''
         self.smallFieldValue = fieldValue # update the field container
         current = fieldValue / self.smallCoilFieldGain # calculate the current from the field gain
-        self.dacVoltage = current * voltageGain # V = I*R
+        self.dacVoltage = current * self.voltageGain # V = I*R
 
     def setField(self, fieldValue):
         '''
@@ -102,18 +103,22 @@ class CoilWithCorrection(Coil):
         # set the large coils only if we are out of range of the dacs
         maximumChangeInField = largeCoilFieldOffset + smallCoilFieldRange
         minimumChangeInField = largeCoilFieldOffset - smallCoilFieldRange
+
+        self.smallFieldValue = (fieldValue - self.largeCoilField)
+
         if self.smallFieldValue > maximumChangeInField or self.smallFieldValue < minimumChangeInField:
             # renormalize!
             # set the large coil to the field value minus the field that we will add with the adustment coils
             self.setLargeCoilField(fieldValue - largeCoilFieldOffset)
 
-        # for the small coil, we need to first provide the field offset but also
-        # calculate the remaining field (with mod) to get a precise measurement
-        self.smallCoilField = (fieldValue - self.largeCoilField)
+        # for the small coil, we need to first provide the field offset
+        # setLargeCoilField recalculates the true field contribution
+        # of the large coil so we can simply subtract that from our desired field value,
+        # and set the small coil field.
+        self.setSmallCoilField(fieldValue - self.largeCoilField)) 
+        # We do NOT want to run the labjack code here because its better to give
+        # it both coil values at once in the xyzFieldControl module.
 
-        # add the offset with the remainder to get the small field value.
-        self.smallCoilField = (smallCoilFieldOffset + smallCoilFieldRemainder)
-
-        self.coilField = fieldValue # update the total coil field
+        self.coilField = fieldValue # update the total coil field for the next call
 
         return
