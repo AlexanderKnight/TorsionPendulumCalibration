@@ -29,13 +29,52 @@ yFieldOffset = 13.883e-6 # T
 zFieldOffset = 48.9e-6 # T
 
 # insanteate the coil objects.
-xCoil = coil.CoilWithCorrection('/dev/tty.usbserial-FTBZ1G1B', xFieldGain, 'DAC0', xAFieldGain)
-yCoil = coil.CoilWithCorrection('/dev/tty.usbserial-FTBYZZIN', yFieldGain, 'DAC1', yAFieldgain)
+xCoil = coil.CoilWithCorrection('/dev/tty.usbserial-FTBZ1G1B', xFieldGain,
+                                'DAC0', xAFieldGain)
+
+yCoil = coil.CoilWithCorrection('/dev/tty.usbserial-FTBYZZIN', yFieldGain,
+                                'DAC1', yAFieldgain)
+
 zCoil = coil.Coil('/dev/tty.usbserial-FTFBPHDT', zFieldGain)
+
+def openPorts():
+    # open the powersupply serial ports
+    xCoil.supply.openPort()
+    yCoil.supply.openPort()
+    zCoil.supply.openPort()
+    print('opened all three powersupplies')
+
+    # open the labjack serial port
+    handle = ljm.open(ljm.constants.dtANY, ljm.constants.ctANY, "ANY")
+    # print the labjack info
+    info = ljm.getHandleInfo(handle)
+    print("Opened a LabJack with Device type: %i, Connection type: %i,\n" \
+        "Serial number: %i, IP address: %s, Port: %i,\nMax bytes per MB: %i" % \
+        (info[0], info[1], info[2], ljm.numberToIP(info[3]), info[4], info[5]))
+    return(handle) # return the handle so e can close it later
+
+def closePorts(handle):
+    # pass in the labjack handle so we don't have to open it on import
+    xCoil.supply.closePort()
+    yCoil.supply.closePort()
+    zCoil.supply.closePort()
+    print('closed all three powersupplies')
+
+    ljm.close(handle)
+    print(closed labjack)
+    return
 
 # define field setting functions
 def fine_field_cart(xField, yField, zField):
     # calculate the currents and voltages for each coil
+    # and set powersupplies to the proper current for each coil
     xCoil.setField(xField)
     yCoil.setField(yField)
     zCoil.setLargeCoilField(zField)
+
+    # now adust the adustment coils with the labjack
+    # Setup and call eWriteNames to write values to the LabJack.
+    numFrames = 2
+    names = [xCoil.dacName, yCoil.dacName]
+    analogValues = [xCoil.dacVoltage, yCoil.dacVoltage] # [2.5 V, 12345]
+    ljm.eWriteNames(handle, numFrames, names, analogValues)
