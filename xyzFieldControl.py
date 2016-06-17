@@ -66,8 +66,10 @@ def closePorts(handle):
 
 # define field setting functions
 def fine_field_cart(xField, yField, zField):
-    # calculate the currents and voltages for each coil
-    # and set powersupplies to the proper current for each coil
+    '''
+    Set powersupplies to the proper current for each coil
+    and set the DACs to the correct voltage with the labjack.
+    '''
     xCoil.setField(xField)
     yCoil.setField(yField)
     zCoil.setLargeCoilField(zField)
@@ -78,3 +80,14 @@ def fine_field_cart(xField, yField, zField):
     names = [xCoil.dacName, yCoil.dacName]
     analogValues = [xCoil.dacVoltage, yCoil.dacVoltage] # [2.5 V, 12345]
     ljm.eWriteNames(handle, numFrames, names, analogValues)
+    return
+
+
+def field_cart(xField, yField, zField):
+    '''
+    Corsely set the coils using the powersupplies only!
+    '''
+    xCoil.setLargeCoilField(xField)
+    yCoil.setLargeCoilField(yField)
+    zCoil.setLargeCoilField(zField)
+    return
