@@ -28,14 +28,14 @@ xFieldOffset = 13.883e-6 # T
 yFieldOffset = 13.883e-6 # T
 zFieldOffset = 48.9e-6 # T
 
-'''
-# assign the correct port address to each supply
-xCoil = powersupply.PowerSupply('/dev/tty.usbserial-FTBZ1G1B')
-yCoil = powersupply.PowerSupply('/dev/tty.usbserial-FTBYZZIN')
-zCoil = powersupply.PowerSupply('/dev/tty.usbserial-FTFBPHDT')
-'''
-
 # insanteate the coil objects.
-xCoil = coil.CoilWithCorrection()
-yCoil = coil.CoilWithCorrection()
-zCoil = coil.Coil()
+xCoil = coil.CoilWithCorrection('/dev/tty.usbserial-FTBZ1G1B', xFieldGain, 'DAC0', xAFieldGain)
+yCoil = coil.CoilWithCorrection('/dev/tty.usbserial-FTBYZZIN', yFieldGain, 'DAC1', yAFieldgain)
+zCoil = coil.Coil('/dev/tty.usbserial-FTFBPHDT', zFieldGain)
+
+# define field setting functions
+def fine_field_cart(xField, yField, zField):
+    # calculate the currents and voltages for each coil
+    xCoil.setField(xField)
+    yCoil.setField(yField)
+    zCoil.setLargeCoilField(zField)
