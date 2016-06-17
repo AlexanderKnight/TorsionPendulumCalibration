@@ -1,3 +1,6 @@
+import sys
+sys.path.append("./../PowerSupplyControl/")
+import powersupply
 
 class Coil:
     '''
@@ -19,6 +22,7 @@ class Coil:
 
         # innitalize field value containers
         self.coilField = 0.0 # total field
+        self.largeCoilCurrent = 0.0
 
         return(self)
 
@@ -28,6 +32,7 @@ class Coil:
         '''
         # calculate the current from the field value
         current = fieldValue / self.largeFieldGain
+        self.largeCoilCurrent = current
         self.supply.current(current) # make sure the current is in milliamps
         # update the stored value of the
 
@@ -69,7 +74,11 @@ class CoilWithCorrection(Coil):
         self.dacVoltage = current * voltageGain # V = I*R
 
     def setField(self, fieldValue):
-
+        '''
+        set both the small and large coils.
+        use the large coils to get in range of the desired value,
+        and the small ones to precisely set the field.
+        '''
         # calculate the smallest field that the large coil can produce
         minimumLargeCoilFieldStep = self.minPowerSupplyCurrentStep * self.LargeFieldGain
         # total range of the small coil.
@@ -96,4 +105,6 @@ class CoilWithCorrection(Coil):
         # add the offset with the remainder to get the small field value.
         self.smallCoilField = (smallCoilFieldOffset + smallCoilFieldRemainder)
 
-        return
+        self.coilField = fieldValue # update the total coil field
+
+        return 
