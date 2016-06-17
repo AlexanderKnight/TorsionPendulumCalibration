@@ -42,7 +42,7 @@ class CoilWithCorrection(Coil):
     '''
     coil with additional correction coil controlled by the labjack
     '''
-    def __init__(self, powersupplyAddress, largeFieldGain, labjackHandle, dacName, smallFieldGain):
+    def __init__(self, powersupplyAddress, largeFieldGain, dacName, smallFieldGain):
 
         Coil.__init__(self, powersupplyAddress, largeFieldGain)
 
@@ -107,4 +107,4 @@ class CoilWithCorrection(Coil):
 
         self.coilField = fieldValue # update the total coil field
 
-        return 
+        return
