@@ -146,7 +146,7 @@ class PowerSupply():
 
         if setCurrent != 'None': # if we pass a value other than none, try to set the current
             # convert setCurrent to miliamps for the powersupply
-            print('setcurrent type = ',type(setCurrent))
+            print('setcurrent type = %s, value = %s' % (type(setCurrent), setCurrent))
             setCurrent *= 1e3
             current=str('%05.1f' % setCurrent) # sets the setCurrent to have 5 chars and 3 digits before and 1 digit after the decimal
             out = self.writeToPort(bytearray('CURR ' + current, 'utf-8')) #format and write to the port

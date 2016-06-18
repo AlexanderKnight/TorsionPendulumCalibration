@@ -40,7 +40,7 @@ try:
                     sumSignal.append([xField, yField])
     '''
     # try something a bit more simple
-    xyz.field_cart(xyz.yCoil.appliedMaxField, xyz.yCoil.appliedMaxField, xyz.zCoil.largeCoilField)
+    xyz.field_cart(xyz.xCoil.appliedMaxField, xyz.yCoil.appliedMaxField, xyz.zCoil.largeCoilField)
 
     pass
 except Exception as e:

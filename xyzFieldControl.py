@@ -16,14 +16,6 @@ zFieldGain = u.ufloat(132.16e-6, 0.08e-6) # T/A
 xAFieldGain = xFieldGain / 25 # T/A
 yAFieldgain = yFieldGain / 20 # T/A
 
-# power supply current command limits
-maxPowerSupplyCurrent = 0.9999 # A
-minPowerSupplyCurrent = 0.0010 # A
-
-# preliminary rough estimate feild values
-xFieldOffset = 13.883e-6 # T
-yFieldOffset = 13.883e-6 # T
-zFieldOffset = 48.9e-6 # T
 
 # insanteate the coil objects.
 xCoil = coil.CoilWithCorrection('/dev/tty.usbserial-FTBZ1G1B', xFieldGain,
