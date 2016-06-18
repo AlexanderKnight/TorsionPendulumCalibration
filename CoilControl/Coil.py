@@ -8,36 +8,41 @@ class Coil:
     '''
     def __init__(self, powersupplyAddress, largeCoilFieldGain):
         # assign the correct port address to a powersupply objectsupply
-        self.supply = powersupply.PowerSupply(powersupplyAdress)
+        self.supply = powersupply.PowerSupply(powersupplyAddress)
 
         # calibration dependant data:
-        self.largeCoilFieldGain = largeCoilFieldGain
+        self.largeCoilFieldGain = largeCoilFieldGain.n # T/A
         # power supply current command limits
-        self.maxPowerSupplyCurrent = 0.9999 # A
-        self.minPowerSupplyCurrent = 0.0010 # A
+        self.maxPowerSupplyCurrent = 0.9990 # A
+        self.minPowerSupplyCurrent = 0.0020 # A
 
         # Maximum and minimum possible field that can be produced by the coil.
-        self.appliedMaxField = fieldGain.n * maxPowerSupplyCurrent
-        self.appliedMinField = fieldGain.n * minPowerSupplyCurrent
+        self.appliedMaxField = self.largeCoilFieldGain * self.maxPowerSupplyCurrent
+        self.appliedMinField = self.largeCoilFieldGain * self.minPowerSupplyCurrent
 
         # innitalize field value containers
-        self.coilField = 0.0 # total field
-        self.largeCoilCurrent = 0.0
+        self.largeCoilCurrent = self.supply.current() # Amps
+        #print(self.largeCoilCurrent, type(self))
+        self.largeCoilField = self.largeCoilCurrent * self.largeCoilFieldGain # total field
 
-        return(self)
+        return
 
     def setLargeCoilField(self, fieldValue):
         '''
         Calculates the current required for the specified field.
         '''
-        # calculate the current from the field value
-        current = fieldValue / self.largeCoilFieldGain
-        self.largeCoilCurrent = ('%5.1f' % current) # format the current the same way powersupply does
+        if fieldValue != self.largeCoilField:
+            # calculate the current from the field value
+            current = fieldValue / self.largeCoilFieldGain
+            self.largeCoilCurrent = current
         # with the formatted current we can recalculate the largeCoilField
-        self.largeCoilField = self.largeCoilCurrent * self.largeCoilfieldGain
+            self.largeCoilField = self.largeCoilCurrent * self.largeCoilFieldGain
 
-        self.supply.current(self.largeCoilCurrent) # make sure the current is in milliamps
+            #print(self.largeCoilCurrent, type(self))
+            self.supply.current(self.largeCoilCurrent) # make sure the current is in AMPS
         # update the stored value of the
+        else:
+            print('coil already set to %s' % self.largeCoilField)
 
         return
 
@@ -58,10 +63,10 @@ class CoilWithCorrection(Coil):
         # large powersupplies
         self.minPowerSupplyCurrentStep = 0.0001 # Amps
         # and the field now gets divided into two coils
-        self.largeCoilField = 0.0 # portion of the total field controlled by the large coils
         self.smallCoilField = 0.0 # portion of the total field for the small coils
+        self.coilField = self.largeCoilField + self.smallCoilField
 
-        return(self)
+        return
 
     def setSmallCoilField(self, fieldValue):
         '''
@@ -115,7 +120,7 @@ class CoilWithCorrection(Coil):
         # setLargeCoilField recalculates the true field contribution
         # of the large coil so we can simply subtract that from our desired field value,
         # and set the small coil field.
-        self.setSmallCoilField(fieldValue - self.largeCoilField)) 
+        self.setSmallCoilField(fieldValue - self.largeCoilField)
         # We do NOT want to run the labjack code here because its better to give
         # it both coil values at once in the xyzFieldControl module.
 
