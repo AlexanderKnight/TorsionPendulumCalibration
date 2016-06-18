@@ -25,7 +25,7 @@ zFieldGain = u.ufloat(132.16e-6, 0.08e-6) # T/A
 xAFieldGain = xFieldGain / 25
 yAFieldgain = yFieldGain / 20
 
-# power supply current command limits 
+# power supply current command limits
 maxPowerSupplyCurrent = 0.9999 #A
 minPowerSupplyCurrent = 0.0010 #A
 
@@ -44,46 +44,46 @@ xAppliedMinField = xFieldGain.n * minPowerSupplyCurrent
 yAppliedMinField = yFieldGain.n * minPowerSupplyCurrent
 zAppliedMinField = zFieldGain.n * minPowerSupplyCurrent
 
-#torsionalZero = 
-#torsionConstant = 
+#torsionalZero =
+#torsionConstant =
 
 
 def field_polar(fieldMagnitude, fieldDirection):
     '''
     sets the field in the coils using the calibration data with polar coridinates as inputs
     does not allow the field to be greater than the smallest field offset.
-    '''    
+    '''
     angleRad = np.radians(fieldDirection) # ((np.pi)/(180))*angle
-    
-    # convert to cartesian 
+
+    # convert to cartesian
     xField = xFieldOffset + (fieldMagnitude * np.sin(angleRad))
     yField = yFieldOffset + (fieldMagnitude * np.cos(angleRad))
-    
+
     # devide the field-component by the axis gain to get the desired current for each coil
     xCurrent = xField / xFieldGain
     yCurrent = yField / yFieldGain
-    
+
     xCoil.current(xCurrent.n*1e3) # set to the nominal value of the current
     yCoil.current(yCurrent.n*1e3) # with the .n (from the uncertinties package)
-    
+
     return
 
 def field_cart(xField, yField):
     '''
     sets the field in the coils using the calibration data with cartesian coordinates as input
     '''
-    
+
     # devide the field-component by the axis gain to get the desired current for each coil
     xCurrent = xField / xFieldGain
     yCurrent = yField / yFieldGain
-    
+
     print(xCurrent.n*1e3, yCurrent.n*1e3)
     xCoil.current(xCurrent.n*1e3) # set to the nominal value of the current
     yCoil.current(yCurrent.n*1e3) # with the .n (from the uncertinties package)
-    
+
     return
-    
-    
+
+
 # open the powersupply ports
 xCoil.openPort()
 yCoil.openPort()
@@ -104,6 +104,8 @@ Bx = np.linspace(xAppliedMinField, xAppliedMaxField, 40)
 By = np.linspace(yAppliedMinField, yAppliedMaxField, 1000)
 Bz = np.linspace(56.0, 62.0, 200)
 
+
+
 minSumSignal = 3.0
 
 sumSignal = []
@@ -117,7 +119,7 @@ for i in range(len(Bx)):
             if result > minSumSignal:
                 sumSignal.append([Bx[i],By[j]])
     else:
-        
+
         for j in range(len(By)):
             field_cart(Bx[i],By[-(j+1)])
             #time.sleep(0.1)
@@ -125,8 +127,8 @@ for i in range(len(Bx)):
             if result > minSumSignal:
                 sumSignal.append([Bx[i],By[-(j+1)]])
 
-# close the labjack connection    
-ljm.close(handle)   
+# close the labjack connection
+ljm.close(handle)
 
 # close the powersupply conections
 xCoil.closePort()
@@ -144,4 +146,4 @@ for i in range(len(sumSignal)):
 np.savetxt(timeStamp+'quadtrantSearchData.txt', sumSignal)
 plt.savefig(timeStamp + 'quadrantSearch.png')
 plt.show()
-##############    
+##############
