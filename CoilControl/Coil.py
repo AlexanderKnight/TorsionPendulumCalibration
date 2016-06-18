@@ -11,10 +11,10 @@ class Coil:
         self.supply = powersupply.PowerSupply(powersupplyAddress)
 
         # calibration dependant data:
-        self.largeCoilFieldGain = largeCoilFieldGain.n
+        self.largeCoilFieldGain = largeCoilFieldGain.n # T/A
         # power supply current command limits
-        self.maxPowerSupplyCurrent = 0.9999 # A
-        self.minPowerSupplyCurrent = 0.0010 # A
+        self.maxPowerSupplyCurrent = 0.9990 # A
+        self.minPowerSupplyCurrent = 0.0020 # A
 
         # Maximum and minimum possible field that can be produced by the coil.
         self.appliedMaxField = self.largeCoilFieldGain * self.maxPowerSupplyCurrent
@@ -22,7 +22,7 @@ class Coil:
 
         # innitalize field value containers
         self.largeCoilCurrent = self.supply.current() # Amps
-        print(self.largeCoilCurrent, type(self))
+        #print(self.largeCoilCurrent, type(self))
         self.largeCoilField = self.largeCoilCurrent * self.largeCoilFieldGain # total field
 
         return
@@ -34,11 +34,11 @@ class Coil:
         if fieldValue != self.largeCoilField:
             # calculate the current from the field value
             current = fieldValue / self.largeCoilFieldGain
-            self.largeCoilCurrent = float('%5.1f' % current) # format the current the same way powersupply does
+            self.largeCoilCurrent = current
         # with the formatted current we can recalculate the largeCoilField
             self.largeCoilField = self.largeCoilCurrent * self.largeCoilFieldGain
 
-            print(self.largeCoilCurrent, type(self))
+            #print(self.largeCoilCurrent, type(self))
             self.supply.current(self.largeCoilCurrent) # make sure the current is in AMPS
         # update the stored value of the
         else:

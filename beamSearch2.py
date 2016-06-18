@@ -1,17 +1,19 @@
 import xyzFieldControl as xyz
 import numpy as np
 import time as time
+import matplotlib.pyplot as plt
+import time as time
 
 
 
 # steps to run the simulation for:
-Bx = np.linspace(xyz.xCoil.appliedMinField, xyz.xCoil.appliedMaxField, 4)
-By = np.linspace(xyz.xCoil.appliedMinField, xyz.xCoil.appliedMaxField, 500)
+Bx = np.linspace(xyz.xCoil.appliedMinField, xyz.xCoil.appliedMaxField, 2)
+By = np.linspace(xyz.xCoil.appliedMinField, xyz.xCoil.appliedMaxField, 1000)
 
 backwardsBy = By[::-1]
 
 minSumSignal = 3.0 # analog voltage goes between 0 and 6 volts roughly
-sumSignal = []
+sumSignal = np.array([0.0,0.0])
 
 
 
@@ -23,25 +25,27 @@ zCurrent = (xyz.zCoil.supply.current())
 # xyz.zCoil.supply.current(439.5)
 
 try:
-    '''for i, xField in enumerate(Bx):
+    for i, xField in enumerate(Bx):
+        time.sleep(2)
         if i % 2:
             for j, yField in enumerate(By):
                 xyz.field_cart(xField, yField, xyz.zCoil.largeCoilField)
                 #time.sleep(0.1)
-                result = float(ljm.eReadName(handle,'AIN0'))
+                result = float(xyz.ljm.eReadName(handle,'AIN0'))
                 if result > minSumSignal:
-                    sumSignal.append([xField, yField])
+                    sumSignal = np.vstack((sumSignal, np.array([xField, yField])))
         else:
             for j, yField in enumerate(backwardsBy):
                 xyz.field_cart(xField, yField, xyz.zCoil.largeCoilField)
                 #time.sleep(0.1)
-                result = float(ljm.eReadName(handle,'AIN0'))
+                result = float(xyz.ljm.eReadName(handle,'AIN0'))
                 if result > minSumSignal:
-                    sumSignal.append([xField, yField])
+                    sumSignal = np.vstack((sumSignal, np.array([xField, yField])))
+
     '''
     # try something a bit more simple
     xyz.field_cart(xyz.xCoil.appliedMaxField, xyz.yCoil.appliedMaxField, xyz.zCoil.largeCoilField)
-
+    '''
     pass
 except Exception as e:
     # helpful to close the ports on except when debugging the code!
@@ -54,9 +58,13 @@ except Exception as e:
 timeStamp = time.strftime('%m_%d_%y_%H_%M_%S')
 
 # convert sumSignal into numpy array
-np.asarray(sumSignal)
+print(sumSignal)
 
-plt.plot(sumSignal[:,0], sumSignal[:,1], 'o')
+xarray = sumSignal[:,0]
+yarray = sumSignal[:,1]
+print(xarray, yarray)
+
+plt.plot(xarray, yarray, 'o')
 np.savetxt(timeStamp+'quadtrantSearchData.txt', sumSignal)
 plt.savefig(timeStamp + 'quadrantSearch.png')
 plt.show()
