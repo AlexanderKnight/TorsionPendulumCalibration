@@ -20,11 +20,10 @@ handle = xyz.openPorts()
 
 #lock in the z bause we know what it is (don't change it)
 zCurrent = (xyz.zCoil.supply.current())
-print(zCurrent)
 # xyz.zCoil.supply.current(439.5)
 
 try:
-    for i, xField in enumerate(Bx):
+    '''for i, xField in enumerate(Bx):
         if i % 2:
             for j, yField in enumerate(By):
                 xyz.field_cart(xField, yField, xyz.zCoil.largeCoilField)
@@ -39,6 +38,9 @@ try:
                 result = float(ljm.eReadName(handle,'AIN0'))
                 if result > minSumSignal:
                     sumSignal.append([xField, yField])
+    '''
+    # try something a bit more simple
+    xyz.field_cart(xyz.yCoil.appliedMaxField, xyz.yCoil.appliedMaxField, xyz.zCoil.largeCoilField)
 
     pass
 except Exception as e:

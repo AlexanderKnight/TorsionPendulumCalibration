@@ -21,7 +21,8 @@ class Coil:
         self.appliedMinField = self.largeCoilFieldGain * self.minPowerSupplyCurrent
 
         # innitalize field value containers
-        self.largeCoilCurrent = self.supply.current() * 1e-3 # convert from miliamps to Amps
+        self.largeCoilCurrent = self.supply.current() # Amps
+        print(self.largeCoilCurrent, type(self))
         self.largeCoilField = self.largeCoilCurrent * self.largeCoilFieldGain # total field
 
         return
@@ -37,8 +38,8 @@ class Coil:
         # with the formatted current we can recalculate the largeCoilField
             self.largeCoilField = self.largeCoilCurrent * self.largeCoilFieldGain
 
-            print(self.largeCoilCurrent * 1e3)
-            self.supply.current(self.largeCoilCurrent * 1e3) # make sure the current is in milliamps
+            print(self.largeCoilCurrent, type(self))
+            self.supply.current(self.largeCoilCurrent) # make sure the current is in AMPS
         # update the stored value of the
         else:
             print('coil already set to %s' % self.largeCoilField)
