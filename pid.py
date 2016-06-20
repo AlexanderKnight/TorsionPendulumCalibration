@@ -61,6 +61,7 @@ lastLeft = 0
 try:
 	while True:
 		# querry the labjack
+		time = time.time()
 		sumSignal, leftMinusRight = ljm.eReadNames(handle, 2, ['AIN0', 'AIN1'])
 		# run the control loop
 		output = pid(setpoint, leftMinusRight, lastLeft, 1)
@@ -68,6 +69,8 @@ try:
 
 		# save the (now) old leftMinusRight value for the next loop
 		lastLeft = leftMinusRight
+		dt = time.time() - time
+		print(dt)
 
 except Exception as e:
     # helpful to close the ports on except when debugging the code!
@@ -75,11 +78,6 @@ except Exception as e:
     print('closed all the ports')
     print(e) # print the exception
     raise
-
-
-
-
-
 
 # work in the optical zero space so we are always adusting perpenductular to the optical zero.
 
