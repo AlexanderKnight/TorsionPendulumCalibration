@@ -53,13 +53,28 @@ zCurrent = (xyz.zCoil.largeCoilCurrent)
 opticalZeroRotation = math.pi/4 # radians
 
 setpoint = 0
+lastSum = 0
+lastLeft = 0
+# make some dque objects for leftMinusRight and sumSignal?
+
 
 try:
 	while True:
 		# querry the labjack
 		sumSignal, leftMinusRight = ljm.eReadNames(handle, 2, ['AIN0', 'AIN1'])
 		# run the control loop
-		output = pid(setpoint, )
+		output = pid(setpoint, leftMinusRight, lastLeft, 1)
+		xyz.fine_field_cart_rotation(output, yField, zField, opticalZeroRotation, handle)
+
+		# save the (now) old leftMinusRight value for the next loop
+		lastLeft = leftMinusRight
+
+except Exception as e:
+    # helpful to close the ports on except when debugging the code!
+    xyz.closePorts(handle)
+    print('closed all the ports')
+    print(e) # print the exception
+    raise
 
 
 
