@@ -1,4 +1,5 @@
 import uncertainties as u
+import math
 from labjack import ljm # import labjack library
 # now import the modules that we wrote
 import sys
@@ -86,14 +87,14 @@ def field_cart(xField, yField, zField):
 # to the optical zero.
 
 
-def rotate_about_origin(xField, yField, phi):
+def fine_field_cart_rotation(xField, yField, zField, phi, handle):
     '''
     rotate a coordinate system so we can allign with the optical zero
     '''
-    import math
+    # do a rotation about the z axis.
     xFieldPrime = xField * math.cos(phi) + yField * math.sin(phi)
     yFieldPrime = yField * math.cos(phi) - xField * math.sin(phi)
 
-    return(xFieldPrime, yFieldPrime)
+    fine_field_cart(xFieldPrime, yFieldPrime, zField, phi, handle)
 
-def field_cart_rotation
+    return(xFieldPrime, yFieldPrime)

@@ -157,7 +157,7 @@ class PowerSupply():
         else: # get the current current from the powersupply
             out = self.writeToPort(bytearray('CURR?', 'utf-8'))
             if type(out) != float:
-                elf.parseErrorMessages(out) # analize errors
+                self.parseErrorMessages(out) # analize errors
                 raise Exception('enable the exceptions in the parseErrorMessages functon!')
             # convert out to AMPS from milliamps
             out *= 1e-3
