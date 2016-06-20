@@ -26,6 +26,7 @@ yCoil = coil.CoilWithCorrection('/dev/tty.usbserial-FTBYZZIN', yFieldGain,
 
 zCoil = coil.Coil('/dev/tty.usbserial-FTFBPHDT', zFieldGain)
 
+
 def openPorts():
     # open the powersupply serial ports
     xCoil.supply.openPort()
@@ -54,7 +55,7 @@ def closePorts(handle):
     return
 
 # define field setting functions
-def fine_field_cart(xField, yField, zField):
+def fine_field_cart(xField, yField, zField, handle):
     '''
     Set powersupplies to the proper current for each coil
     and set the DACs to the correct voltage with the labjack.

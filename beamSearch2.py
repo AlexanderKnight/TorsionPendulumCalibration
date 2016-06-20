@@ -2,12 +2,11 @@ import xyzFieldControl as xyz
 import numpy as np
 import time as time
 import matplotlib.pyplot as plt
-import time as time
 
 
 
 # steps to run the simulation for:
-Bx = np.linspace(xyz.xCoil.appliedMinField, xyz.xCoil.appliedMaxField, 2)
+Bx = np.linspace(xyz.xCoil.appliedMinField, xyz.xCoil.appliedMaxField, 5)
 By = np.linspace(xyz.xCoil.appliedMinField, xyz.xCoil.appliedMaxField, 1000)
 
 backwardsBy = By[::-1]
@@ -20,23 +19,22 @@ sumSignal = np.array([0.0,0.0])
 # open the all ports and get the labjack handle
 handle = xyz.openPorts()
 
-#lock in the z bause we know what it is (don't change it)
-zCurrent = (xyz.zCoil.supply.current())
+#lock in the z because we know what it is (don't change it)
+zCurrent = (xyz.zCoil.largeCoilCurrent)
 # xyz.zCoil.supply.current(439.5)
 
 try:
     for i, xField in enumerate(Bx):
-        time.sleep(2)
         if i % 2:
             for j, yField in enumerate(By):
-                xyz.field_cart(xField, yField, xyz.zCoil.largeCoilField)
+                xyz.fine_field_cart(xField, yField, xyz.zCoil.largeCoilField, handle)
                 #time.sleep(0.1)
                 result = float(xyz.ljm.eReadName(handle,'AIN0'))
                 if result > minSumSignal:
                     sumSignal = np.vstack((sumSignal, np.array([xField, yField])))
         else:
             for j, yField in enumerate(backwardsBy):
-                xyz.field_cart(xField, yField, xyz.zCoil.largeCoilField)
+                xyz.fine_field_cart(xField, yField, xyz.zCoil.largeCoilField, handle)
                 #time.sleep(0.1)
                 result = float(xyz.ljm.eReadName(handle,'AIN0'))
                 if result > minSumSignal:
