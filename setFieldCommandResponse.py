@@ -8,7 +8,7 @@ handle = xyz.openPorts()
 #lock in the z because we know what it is (don't change it)
 zCurrent = (xyz.zCoil.largeCoilCurrent)
 # xyz.zCoil.supply.current(439.5)
-yField = 42.5e-6
+yField = 41.92e-6
 
 try:
 

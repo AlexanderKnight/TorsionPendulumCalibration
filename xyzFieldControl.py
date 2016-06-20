@@ -81,3 +81,19 @@ def field_cart(xField, yField, zField):
     yCoil.setLargeCoilField(yField)
     zCoil.setLargeCoilField(zField)
     return
+
+# rotate the coridinate system to allow us to input field values perpendicular
+# to the optical zero.
+
+
+def rotate_about_origin(xField, yField, phi):
+    '''
+    rotate a coordinate system so we can allign with the optical zero
+    '''
+    import math
+    xFieldPrime = xField * math.cos(phi) + yField * math.sin(phi)
+    yFieldPrime = yField * math.cos(phi) - xField * math.sin(phi)
+
+    return(xFieldPrime, yFieldPrime)
+
+def field_cart_rotation

@@ -41,7 +41,7 @@ class Coil:
             #print(self.largeCoilCurrent, type(self))
             self.supply.current(self.largeCoilCurrent) # make sure the current is in AMPS
         # update the stored value of the
-        else:
+        #else:
             #print('coil already set to %s' % self.largeCoilField)
 
         return
@@ -54,7 +54,7 @@ class CoilWithCorrection(Coil):
 
         Coil.__init__(self, powersupplyAddress, largeCoilFieldGain)
 
-        self.dacName # the DAC to which the adustment coil is conndected
+        self.dacName = dacName # the DAC to which the adustment coil is conndected
         self.smallCoilFieldGain = smallCoilFieldGain # T/A
         self.voltageGain = 250 # opAmp current source gain in (V/A)
         self.dacVoltage = 0.0 # store the voltage to write to the DAC
@@ -96,7 +96,7 @@ class CoilWithCorrection(Coil):
         #  pick the ** for the middle of our field.
         # usable +- range of the small coil (total range is 3 steps)
         # o  |--{--|**|--}--|       Curly braces are the trigger points where we want to renormalize
-        smallCoilFieldRange = 1.5 * minimumLargeCoilFieldStep
+        smallCoilFieldRange = 2.5 * minimumLargeCoilFieldStep # allow this to go althe way to the clamping band
         # o  |--|--|**|--|--|       Distance from the left side is 3.5 smallest divisions
         largeCoilFieldOffset = minimumLargeCoilFieldStep * 3.5
         # the extra .5 above is to hack the rounding in the current function :P
