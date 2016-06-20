@@ -52,7 +52,7 @@ class CoilWithCorrection(Coil):
     '''
     def __init__(self, powersupplyAddress, largeCoilFieldGain, dacName, smallCoilFieldGain):
 
-        Coil.__init__(self, powersupplyAddress, largeCoilFieldGain) 
+        Coil.__init__(self, powersupplyAddress, largeCoilFieldGain)
 
         self.dacName # the DAC to which the adustment coil is conndected
         self.smallCoilFieldGain = smallCoilFieldGain # T/A
