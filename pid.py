@@ -56,6 +56,9 @@ setpoint = 0
 
 try:
 	while True:
+		# querry the labjack
+		sumSignal, leftMinusRight = ljm.eReadNames(handle, 2, ['AIN0', 'AIN1'])
+		# run the control loop
 		output = pid(setpoint, )
 
 
