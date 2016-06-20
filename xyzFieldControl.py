@@ -95,6 +95,6 @@ def fine_field_cart_rotation(xField, yField, zField, phi, handle):
     xFieldPrime = xField * math.cos(phi) + yField * math.sin(phi)
     yFieldPrime = yField * math.cos(phi) - xField * math.sin(phi)
 
-    fine_field_cart(xFieldPrime, yFieldPrime, zField, phi, handle)
+    fine_field_cart(xFieldPrime, yFieldPrime, zField, handle)
 
     return(xFieldPrime, yFieldPrime)
