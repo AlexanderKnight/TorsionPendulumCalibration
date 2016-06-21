@@ -1,4 +1,5 @@
 import uncertainties as u
+import math
 from labjack import ljm # import labjack library
 # now import the modules that we wrote
 import sys
@@ -25,6 +26,7 @@ yCoil = coil.CoilWithCorrection('/dev/tty.usbserial-FTBYZZIN', yFieldGain,
                                 'DAC1', yAFieldgain)
 
 zCoil = coil.Coil('/dev/tty.usbserial-FTFBPHDT', zFieldGain)
+
 
 def openPorts():
     # open the powersupply serial ports
@@ -54,7 +56,7 @@ def closePorts(handle):
     return
 
 # define field setting functions
-def fine_field_cart(xField, yField, zField):
+def fine_field_cart(xField, yField, zField, handle):
     '''
     Set powersupplies to the proper current for each coil
     and set the DACs to the correct voltage with the labjack.
@@ -79,4 +81,20 @@ def field_cart(xField, yField, zField):
     xCoil.setLargeCoilField(xField)
     yCoil.setLargeCoilField(yField)
     zCoil.setLargeCoilField(zField)
+    return
+
+# rotate the coridinate system to allow us to input field values perpendicular
+# to the optical zero.
+
+
+def fine_field_cart_rotation(xField, yField, zField, phi, handle):
+    '''
+    rotate a coordinate system so we can allign with the optical zero
+    '''
+    # do a rotation about the z axis.
+    xFieldPrime = xField * math.cos(phi) + yField * math.sin(phi)
+    yFieldPrime = yField * math.cos(phi) - xField * math.sin(phi)
+
+    fine_field_cart(xFieldPrime, yFieldPrime, zField, handle)
+
     return

@@ -31,18 +31,18 @@ class Coil:
         '''
         Calculates the current required for the specified field.
         '''
-        if fieldValue != self.largeCoilField:
+        if fieldValue != self.largeCoilField: # prevents setting the coil with the same value
             # calculate the current from the field value
             current = fieldValue / self.largeCoilFieldGain
-            self.largeCoilCurrent = current
+            self.largeCoilCurrent = float('%5.4f' % current) # fomat the large coil current to the same precision as the powersupply
         # with the formatted current we can recalculate the largeCoilField
             self.largeCoilField = self.largeCoilCurrent * self.largeCoilFieldGain
 
             #print(self.largeCoilCurrent, type(self))
             self.supply.current(self.largeCoilCurrent) # make sure the current is in AMPS
         # update the stored value of the
-        else:
-            print('coil already set to %s' % self.largeCoilField)
+        #else:
+            #print('coil already set to %s' % self.largeCoilField)
 
         return
 
@@ -78,7 +78,7 @@ class CoilWithCorrection(Coil):
         be passed to the labjack with the other DAC setting to minimize comunication time
         '''
         self.smallFieldValue = fieldValue # update the field container
-        current = fieldValue / self.smallCoilFieldGain # calculate the current from the field gain
+        current = fieldValue / self.smallCoilFieldGain.n # calculate the current from the field gain
         self.dacVoltage = current * self.voltageGain # V = I*R
 
     def setField(self, fieldValue):
@@ -87,16 +87,17 @@ class CoilWithCorrection(Coil):
         use the large coils to get in range of the desired value,
         and the small ones to precisely set the field.
         '''
-        # calculate the smallest field that the large coil can produce
+        # calculate the smallest field that the large coil can produce with the
+        # powersupplies. This will be the unit that we use to calculate avalable ranges.
         minimumLargeCoilFieldStep = self.minPowerSupplyCurrentStep * self.largeCoilFieldGain
         # total range of the small coil.
-        # |--|--|--|--|--|--|--|--| the small ticks are the minimumLargeCoilFieldStep
-        #    |--|--|**|--|--|       this is the range of the dac after voltage clamping band
+        # o--|--|--|--|--|--|--|->| the small ticks are the minimumLargeCoilFieldStep
+        # o  |--|--|**|--|--|       this is the range of the dac after removing the voltage clamping band of the opAmp (stay away from the voltage rails)
         #  pick the ** for the middle of our field.
         # usable +- range of the small coil (total range is 3 steps)
-        #    |--{--|**|--}--|       Curly braces are the trigger points where we want to renormalize
-        smallCoilFieldRange = 1.5 * minimumLargeCoilFieldStep
-        # |  |--|--|**|--|--|       Distance from the left side is 3.5 smallest divisions
+        # o  |--{--|**|--}--|       Curly braces are the trigger points where we want to renormalize
+        smallCoilFieldRange = 2.5 * minimumLargeCoilFieldStep # allow this to go althe way to the clamping band
+        # o  |--|--|**|--|--|       Distance from the left side is 3.5 smallest divisions
         largeCoilFieldOffset = minimumLargeCoilFieldStep * 3.5
         # the extra .5 above is to hack the rounding in the current function :P
         smallCoilFieldOffse = minimumLargeCoilFieldStep * 3.0
