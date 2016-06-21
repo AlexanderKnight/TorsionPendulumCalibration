@@ -50,6 +50,8 @@ handle = xyz.openPorts()
 #lock in the z because we know what it is (don't change it)
 zCurrent = (xyz.zCoil.largeCoilCurrent)
 
+# this is the rough angle of the optical zero
+# which we use as our coordinate referance. 
 opticalZeroRotation = math.pi/4 # radians
 
 setpoint = 0
