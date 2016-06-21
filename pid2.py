@@ -25,34 +25,24 @@ if sumSignal == True:
 
 
 '''
-#previous position
-#global tempPos
-tempPos = 0.0
 
-
-def pid(setpoint, position):
+def pid(setpoint, position, lastPosition, timeStep):
 	'''
 
 	'''
-	kP = 0.001
+	kP = 0.01
 	kD = 0.00
 	kI = 0.00
-	global tempPos # load in the global variable.
 
-	print(tempPos)
-	lastOffset = tempPos - setpoint # slightly problematic because this should be last setpoint, but we dont really change the setpoint.
+	lastOffset = lastPosition - setpoint # slightly problematic because this should be last setpoint, but we dont really change the setpoint.
 
 	offset = position - setpoint
 
-	area = 1 * offset
+	area = timeStep * offset
 
 	derivative = (offset - lastOffset)
 
-
-	tempPos = position # load up the prevous position for the next call.
-
 	output = kP*offset + kD*derivative + kI * area
-
 	print(output)
 	return output # value to write to the coils (should be a field value perpendictular to the optical zero)
 
@@ -78,10 +68,10 @@ try:
 		time = time.time()
 		sumSignal, leftMinusRight = xyz.ljm.eReadNames(handle, 2, ['AIN0', 'AIN1'])
 		# run the control loop
-		output = pid(setpoint, leftMinusRight)
+		output = pid(setpoint, leftMinusRight, lastLeft, 1) + 
 
 		# set the field
-		xyz.fine_field_cart(xyz.xCoil.largeCoilField, output, xyz.zCoil.largeCoilField, handle)
+		xyz.fine_field_cart(output, xyz.yCoil.largeCoilField, xyz.zCoil.largeCoilField, handle)
 
 		# save the (now) old leftMinusRight value for the next loop
 		lastLeft = leftMinusRight
