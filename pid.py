@@ -65,11 +65,13 @@ try:
 		sumSignal, leftMinusRight = ljm.eReadNames(handle, 2, ['AIN0', 'AIN1'])
 		# run the control loop
 		output = pid(setpoint, leftMinusRight, lastLeft, 1)
+
+		# set the field
 		xyz.fine_field_cart_rotation(output, yField, zField, opticalZeroRotation, handle)
 
 		# save the (now) old leftMinusRight value for the next loop
 		lastLeft = leftMinusRight
-		dt = time.time() - time
+		dt = time.time() - time # keep track of the timestep for consistancy sake.
 		print(dt)
 
 except Exception as e:
