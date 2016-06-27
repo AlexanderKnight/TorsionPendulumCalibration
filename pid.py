@@ -9,7 +9,6 @@ import math as math
 # or if we made them dques then we could pass them to the labjack
 
 '''
-
 setpoint = opticalZero
 
 position = ljm.eRead('AIN0')
@@ -22,8 +21,6 @@ slope = (lastOffset - offset) / timestep
 
 if sumSignal == True:
 	#run the pid loop
-
-
 '''
 
 def pid(setpoint, position, handle):
