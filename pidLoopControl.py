@@ -18,7 +18,7 @@ class PIDControl(kP, kI, kD):
 
         self.output = 0
 
-    def runloop(setpoint, position):
+    def runloop(self, setpoint, position):
         # update the last position etc with the old data
         self.lastSetpoint = self.setpoint
         self.lastPosition = self.position
