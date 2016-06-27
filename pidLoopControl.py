@@ -11,10 +11,12 @@ class PIDControl(kP, kI, kD):
         self.setpoint = 0
         self.position = 0
         self.offset = 0
+        self.timestamp = 0
         # the previous state of the loop
         self.lastSetpoint = 0
         self.lastPosition = 0
         self.lastOffset = 0
+        self.lastTimestamp = 0
 
         self.output = 0
 
@@ -27,12 +29,19 @@ class PIDControl(kP, kI, kD):
         # update the gains with the passed in values.
         self.setpoint = setpoint
         self.position = position
-        self.offset = setpoint - position # swap these to make the output have the right sign
+        self.offset = setpoint - position # swap these to make the output have the correct sign
+
+        # calculate the time step since last loop
+        self.timestamp = time.time()
+        dt = self.lastTimestamp - self.timestamp
+        self.lastTimestamp = self.timestamp # store the timestamp for use next round
 
         # claculate the pid gains
         proportional = self.P * self.offset
-        integral += self.I * ()
-        # calculate the output from the pid gains
-        self.output = () + (self.I * self.)
+        integral += self.I * (dt*self.offset)
+        derivative = self.D * ((self.offset - self.lastOffset)/(dt))
 
-        return
+        # calculate the output from the pid gains
+        self.output = proportional + integral + derivative
+
+        return(self.output)
