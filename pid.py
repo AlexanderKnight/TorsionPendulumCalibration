@@ -4,7 +4,6 @@ import numpy as np
 import time as time
 import math as math
 
-
 # should these be stacks?
 # or if we made them dques then we could pass them to the labjack
 
@@ -64,7 +63,7 @@ handle = xyz.openPorts()
 # Setup and call eWriteNames to configure the AIN on the LabJack.
 numFrames = 3
 names = ["AIN0_NEGATIVE_CH", "AIN0_RANGE", "AIN0_RESOLUTION_INDEX"]
-aValues = [199, 0, 10]
+aValues = [199, 0, 10] # setup the analog register values for the labjack
 xyz.ljm.eWriteNames(handle, numFrames, names, aValues)
 
 #lock in the z because we know what it is (don't change it)
