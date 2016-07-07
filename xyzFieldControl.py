@@ -102,7 +102,7 @@ def fine_field_cart_rotation(xField, yField, zField, phi, handle):
 
     return
 
-def pid_duration(kP, kI, kD, durationInSeconds, labjackHandle):
+"""def pid_duration(kP, kI, kD, durationInSeconds, labjackHandle):
     startTime = time.time() # time stamp to start the clock
     # load in the field values for the coils
-    xField = self.
+    xField = self."""
