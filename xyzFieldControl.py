@@ -13,10 +13,10 @@ xFieldGain = u.ufloat(42.24e-6, 0.08e-6) # T/A
 yFieldGain = u.ufloat(45.99e-6, 0.09e-6) # T/A
 zFieldGain = u.ufloat(132.16e-6, 0.08e-6) # T/A
 
-# field to current gain for the adustment coils (extrapolated from the large coil calibration)
+# field to current gain for the adustment coils which is
+# extrapolated from the large coil calibration.
 xAFieldGain = xFieldGain / 25 # T/A
 yAFieldgain = yFieldGain / 20 # T/A
-
 
 # insanteate the coil objects.
 xCoil = coil.CoilWithCorrection('/dev/tty.usbserial-FTBZ1G1B', xFieldGain,
@@ -76,7 +76,8 @@ def fine_field_cart(xField, yField, zField, handle):
 
 def field_cart(xField, yField, zField):
     '''
-    Corsely set the coils using the powersupplies only!
+    Corsely set the coils using the large powersupplies only.
+    (avoid using the adustment coils)
     '''
     xCoil.setLargeCoilField(xField)
     yCoil.setLargeCoilField(yField)
@@ -89,7 +90,9 @@ def field_cart(xField, yField, zField):
 
 def fine_field_cart_rotation(xField, yField, zField, phi, handle):
     '''
-    rotate a coordinate system so we can allign with the optical zero
+    Rotate a the cordinate system about the z axis
+    so we can allign our control components to be perpendicular
+    and parallel to the optical zero.
     '''
     # do a rotation about the z axis.
     xFieldPrime = xField * math.cos(phi) + yField * math.sin(phi)
@@ -98,3 +101,8 @@ def fine_field_cart_rotation(xField, yField, zField, phi, handle):
     fine_field_cart(xFieldPrime, yFieldPrime, zField, handle)
 
     return
+
+def pid_duration(kP, kI, kD, durationInSeconds, labjackHandle):
+    startTime = time.time() # time stamp to start the clock
+    # load in the field values for the coils
+    xField = self.
