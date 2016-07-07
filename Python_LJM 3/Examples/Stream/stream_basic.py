@@ -50,17 +50,17 @@ try:
     i = 1
     while i <= MAX_REQUESTS:
         ret = ljm.eStreamRead(handle)
-        
+
         data = ret[0]
         scans = len(data)/numAddresses
         totScans += scans
-        
+
         # Count the skipped samples which are indicated by -9999 values. Missed
         # samples occur after a device's stream buffer overflows and are
         # reported after auto-recover mode ends.
         curSkip = data.count(-9999.0)
         totSkip += curSkip
-        
+
         print("\neStreamRead %i" % i)
         ainStr = ""
         for j in range(0, numAddresses):
