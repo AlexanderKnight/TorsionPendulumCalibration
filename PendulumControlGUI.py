@@ -45,12 +45,18 @@ class Application(tk.Frame):
         self.QUIT = tk.Button(self,text='QUIT', fg='red', command=root.destroy)
         self.QUIT.grid(row=99,column=1)
 
+        # open the powersupplies and the labjack and save the handle
+        try:
+            self.handle = xyz.openPorts()
+        except Exception as e:
+            raise e
+
     def SetBField(self):
         try:
-            handle = xyz.openPorts()
-            xyz.fine_field_cart(self.xValue, self.yValue, self.zValue, handle)
+            xyz.fine_field_cart(self.xValue, self.yValue, self.zValue, self.handle)
             print("Magnetic Field Set")
         except Error as err:
+            xyz.closePorts(self.handle) # close the ports before raising the error.
             raise err
         #try:
         #    self.xValue = self.XAxisValue.get()
