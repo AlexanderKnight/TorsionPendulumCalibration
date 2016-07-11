@@ -24,7 +24,8 @@ class PowerSupply():
         return
 
     def closePort(self):
-
+        # clear the buffer on close
+        self.ser.reset_input_buffer()
         self.ser.close()
         self.portOpen = False
         return
