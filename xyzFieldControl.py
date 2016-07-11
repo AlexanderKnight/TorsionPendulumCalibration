@@ -106,7 +106,7 @@ def fine_field_cart(xField, yField, handle):
     #zThread.join()
     t1 = time.time()
     print('total time between = %s' % (t1-t0))
-    print('total time between = {0}'.format(t1-t0))
+    print('total time between = {0}'.format(t1-t0)) # 
 
     return
 
