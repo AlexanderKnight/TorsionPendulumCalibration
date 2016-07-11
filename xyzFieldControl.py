@@ -1,5 +1,5 @@
 import threading
-
+import time
 
 import uncertainties as u
 import math
@@ -81,7 +81,7 @@ def fine_field_cart(xField, yField, handle):
     Set powersupplies to the proper current for each coil
     and set the DACs to the correct voltage with the labjack.
     '''
-
+    t0 = time.time()
     # create the thread objects to handle the serial wait times
     xThread = threading.Thread(target= xCoil.setField, args= [xField])
     yThread = threading.Thread(target= yCoil.setField, args= [yField])
@@ -104,7 +104,9 @@ def fine_field_cart(xField, yField, handle):
     xThread.join()
     yThread.join()
     #zThread.join()
-
+    t1 = time.time()
+    print('total time between = %s' % (t1-t0))
+    print('total time between = {0}'.format(t1-t0))
 
     return
 
