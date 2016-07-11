@@ -88,8 +88,8 @@ def fine_field_cart(xField, yField, handle):
     #zThread = threading.Thread(target= zCoil.setField, args= zField)
 
     # start the threads()
-    yThread.start()
     xThread.start()
+    yThread.start()
     #zThread.start()
 
     # now adust the adustment coils with the labjack
@@ -104,9 +104,10 @@ def fine_field_cart(xField, yField, handle):
     xThread.join()
     yThread.join()
     #zThread.join()
+
     t1 = time.time()
-    print('total time between = %s' % (t1-t0))
-    print('total time between = {0}'.format(t1-t0)) # 
+    #print('total time between = %s' % (t1-t0))
+    #print('total time between = {0}'.format(t1-t0)) #
 
     return
 

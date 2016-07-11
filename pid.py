@@ -1,4 +1,4 @@
- 
+
 import xyzFieldControl as xyz
 import numpy as np
 import time as time
@@ -23,38 +23,46 @@ if sumSignal == True:
 '''
 
 def pid(setpoint, position, handle):
-	'''
+    '''
+    hello this is a doc string
+    '''
 
-	'''
-	kP = 0.019
-	kD = 0.007
-	kI = 0.4
-	global prePos
-	global integral
-	global t0
-	global initialOutput
+    kP = 0.004
+    kD = 0.005
+    kI = 0.4
 
-	# calculate dt and save t0 for the next call.
-	t1 = time.time()
-	dt = t1 - t0
-	t0 = t1
+    #kP = 0.019
+    #kD = 0.007
+    #kI = 0.4
+    global prePos
+    global integral
+    global t0
+    global initialOutput
 
-	offset = position - setpoint
-	preOffset = prePos - setpoint
+    # calculate dt and save t0 for the next call.
+    t1 = time.time()
+    dt = t1 - t0
+    t0 = t1
 
-	integral += (offset * dt)
+    offset = position - setpoint
+    preOffset = prePos - setpoint
 
-	derivative = (offset - preOffset) / dt
+    # only set the integral if it is not saturated
+    if (integral > -5 and offset > 0) or (integral < 5 and offset <= 0):
+        integral += (offset * dt)
 
-	prePos = position # save the position for the next call.
+    derivative = (offset - preOffset) / dt
 
-	output = ((kP * offset) + (kI * integral) + (kD * derivative)) * -1e-7 + initialOutput
+    prePos = position # save the position for the next call.
 
-	# now set the field with the output
-	#print('output = %14.11f\toffset = %14.11f\tdt = %14.11f\tintegral = %14.11f' % (output, offset, position, dt, integral))
-	print('offset = %14.11f\tintegral = %14.11f\tderivative = %14.11f\tdt = %14.11f' % (offset, integral, derivative, dt))
-	xyz.fine_field_cart(xyz.xCoil.appliedMaxField, output, xyz.zCoil.largeCoilField, handle)
+    output = ((kP * offset) + (kI * integral) + (kD * derivative)) * -1e-7 + initialOutput
 
+    # now set the field with the output
+    #print('output = %14.11f\toffset = %14.11f\tdt = %14.11f\tintegral = %14.11f' % (output, offset, position, dt, integral))
+    print('offset = %14.11f\tintegral = %14.11f\tderivative = %14.11f\tdt = %14.11f' % (offset, integral, derivative, dt))
+    xyz.fine_field_cart(xyz.xCoil.appliedMaxField, output, handle)
+
+    return
 
 # open the all ports and get the labjack handle
 handle = xyz.openPorts()
@@ -67,7 +75,7 @@ aValues = [199, 0, 10] # setup the analog register values for the labjack
 xyz.ljm.eWriteNames(handle, numFrames, names, aValues)
 
 #lock in the z because we know what it is (don't change it)
-zCurrent = (xyz.zCoil.largeCoilCurrent)
+#zCurrent = (xyz.zCoil.largeCoilCurrent)
 
 # global variables to be used by the pid loop
 prePos = 0.0 #previous position
@@ -81,16 +89,23 @@ initialOutput = xyz.yCoil.coilField
 
 
 try:
-	while True:
-		# take the optical sensor readings from the labjack
-		sumSignal, leftMinusRight = xyz.ljm.eReadNames(handle, 2, ['AIN0', 'AIN1'])
-		if sumSignal > 3.0: # if we have a sum signal
-			pid(setpoint, leftMinusRight, handle) # run the pid loop
-		else:
-			print('sumSignal = %s' % sumSignal)
-			xyz.yCoil.supply.current(.9126)
-			input('Off sensor! (press enter when on sensor)')
-			initialOutput = xyz.yCoil.coilField
+    while True:
+        # take the optical sensor readings from the labjack
+        sumSignal, leftMinusRight = xyz.ljm.eReadNames(handle, 2, ['AIN0', 'AIN1'])
+        if sumSignal > 3.0: # if we have a sum signal
+            pid(setpoint, leftMinusRight, handle) # run the pid loop
+        else:
+            print('sumSignal = %s' % sumSignal)
+            xyz.yCoil.supply.current(.9648)
+            input('Off sensor! (press enter when on sensor)')
+            dt = .001
+            integral = 0
+            derivative = 0
+            pid(setpoint, leftMinusRight, handle)
+            dt = .001
+            integral = 0
+            derivative = 0
+            pid(setpoint, leftMinusRight, handle)
 
 except KeyboardInterrupt:
 	time.sleep(.5)
