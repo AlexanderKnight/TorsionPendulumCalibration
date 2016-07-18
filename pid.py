@@ -26,9 +26,9 @@ def pid(setpoint, position, handle):
 	'''
 
 	'''
-	kP = 0.01
-	kD = 0.009
-	kI = 0.55
+	kP = 0.019
+	kD = 0.007
+	kI = 0.4
 	global prePos
 	global integral
 	global t0
@@ -88,7 +88,7 @@ try:
 			pid(setpoint, leftMinusRight, handle) # run the pid loop
 		else:
 			print('sumSignal = %s' % sumSignal)
-			xyz.yCoil.supply.current(.9110)
+			xyz.yCoil.supply.current(.9126)
 			input('Off sensor! (press enter when on sensor)')
 			initialOutput = xyz.yCoil.coilField
 
