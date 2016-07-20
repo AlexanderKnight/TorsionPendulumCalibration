@@ -132,10 +132,10 @@ class PowerSupply():
         otherwise it will try to set the current of the powersupply and return a None type.
         This is very similar to the voltage() function but has slightly differet formatting.
 
-        The current is set in AMPS {milliamps} with one digit of precision after the decimal
+        The current is set in AMPS with four digits after the decimal
         (minimum precision = 0.1 mA).
 
-        The returned current float is also in AMPS {milliamps}.
+        The returned current float is also in AMPS.
         '''
 
         #if(self.checkMode() != 'CC'): # make sure the supply is in constant current mode.
@@ -148,7 +148,7 @@ class PowerSupply():
         if setCurrent != 'None': # if we pass a value other than none, try to set the current
             # convert setCurrent to miliamps for the powersupply
             #print('setcurrent type = %s, value = %s' % (type(setCurrent), setCurrent))
-            setCurrent *= 1e3
+            setCurrent *= 1e3 # change from amps to milliamps because that's what the powersupply wants.
             current=str('%05.1f' % setCurrent) # sets the setCurrent to have 5 chars and 3 digits before and 1 digit after the decimal
             out = self.writeToPort(bytearray('CURR ' + current, 'utf-8')) #format and write to the port
             if len(out) != 0: # if we get anything back
@@ -160,7 +160,7 @@ class PowerSupply():
             if type(out) != float:
                 self.parseErrorMessages(out) # analize errors
                 raise Exception('enable the exceptions in the parseErrorMessages functon!')
-            # convert out to AMPS from milliamps
+            # convert output back to AMPS from milliamps
             out *= 1e-3
 
         if initialPortState == False and self.portOpen == True:
