@@ -12,7 +12,7 @@ class PowerSupply():
 
     def openPort(self):
 
-        # open the self.serial port with the settings for the bk-supplies
+        # open the self.serial port with the settings for the bk-1739 supplies
         self.ser = serial.Serial(port= self.portAddress,
                                  baudrate= 9600,
                                  parity= serial.PARITY_NONE,
