@@ -79,7 +79,7 @@ class CoilWithCorrection(Coil):
         """
         self.smallFieldValue = fieldValue # update the field container
         current = fieldValue / self.smallCoilFieldGain.n # calculate the current from the field gain
-        self.dacVoltage = current * self.voltageGain # V = I*R
+        self.dacVoltage = current * self.voltageGain # V = I*R the formula for the op-amp current supply circuit.
 
     def setField(self, fieldValue):
         """
@@ -95,11 +95,11 @@ class CoilWithCorrection(Coil):
         # o  |--|--|**|--|--|       this is the range of the dac after removing the voltage clamping band of the opAmp (stay away from the voltage rails)
         #  pick the ** for the middle of our field.
         # usable +- range of the small coil (total range is 3 steps)
-        # o  |--{--|**|--}--|       Curly braces are the trigger points where we want to renormalize
+        # o  {--|--|**|--|--}       Curly braces are the trigger points where we want to renormalize
         smallCoilFieldRange = 2.5 * minimumLargeCoilFieldStep # allow this to go althe way to the clamping band
         # o  |--|--|**|--|--|       Distance from the left side is 3.5 smallest divisions
         largeCoilFieldOffset = minimumLargeCoilFieldStep * 3.5
-        # the extra .5 above is to hack the rounding in the current function :P
+        # the extra .5 above is to hack the rounding in the current function so that it truncates instead of rounding :P
         smallCoilFieldOffse = minimumLargeCoilFieldStep * 3.0
 
         # with this in mind let's split the field btween the large and small coils
