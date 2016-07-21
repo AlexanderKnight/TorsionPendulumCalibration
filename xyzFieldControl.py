@@ -3,12 +3,13 @@ import time
 
 import uncertainties as u
 import math
-from labjack import ljm # import labjack library
-# now import the modules that we wrote
+# now import the modules that are part of the repo
 import sys
+sys.path.append("./Python_LJM 3/") # check that this works properly
+from labjack import ljm # import labjack library
 sys.path.append("./PowerSupplyControl/")
-sys.path.append("./CoilControl/")
 import powersupply
+sys.path.append("./CoilControl/")
 import coil
 
 # calibration predifines
@@ -62,7 +63,7 @@ def closePorts(handle):
 
 # define field setting functions
 
-# old non-threading field function. 
+# old non-threading field function.
 '''
 def fine_field_cart(xField, yField, zField, handle):
     """
