@@ -61,6 +61,9 @@ def closePorts(handle):
     return
 
 # define field setting functions
+
+# old non-threading field function. 
+'''
 def fine_field_cart(xField, yField, zField, handle):
     """
     Set powersupplies to the proper current for each coil
@@ -76,13 +79,14 @@ def fine_field_cart(xField, yField, zField, handle):
     names = [xCoil.dacName, yCoil.dacName]
     analogValues = [xCoil.dacVoltage, yCoil.dacVoltage] # [2.5 V, 12345]
     ljm.eWriteNames(handle, numFrames, names, analogValues)
-    return"""
+    return
+'''
 
 def fine_field_cart(xField, yField, handle):
-    '''
+    """
     Set powersupplies to the proper current for each coil
     and set the DACs to the correct voltage with the labjack.
-    '''
+    """
     t0 = time.time()
     # create the thread objects to handle the serial wait times
     xThread = threading.Thread(target= xCoil.setField, args= [xField])
