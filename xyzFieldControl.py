@@ -1,3 +1,6 @@
+import threading
+import time
+
 import uncertainties as u
 import math
 from labjack import ljm # import labjack library
@@ -11,7 +14,7 @@ import coil
 # calibration predifines
 xFieldGain = u.ufloat(42.24e-6, 0.08e-6) # T/A
 yFieldGain = u.ufloat(45.99e-6, 0.09e-6) # T/A
-zFieldGain = u.ufloat(132.16e-6, 0.08e-6) # T/A
+#zFieldGain = u.ufloat(132.16e-6, 0.08e-6) # T/A
 
 # field to current gain for the adustment coils which is
 # extrapolated from the large coil calibration.
@@ -25,7 +28,7 @@ xCoil = coil.CoilWithCorrection('/dev/tty.usbserial-FTBZ1G1B', xFieldGain,
 yCoil = coil.CoilWithCorrection('/dev/tty.usbserial-FTBYZZIN', yFieldGain,
                                 'DAC1', yAFieldgain)
 
-zCoil = coil.Coil('/dev/tty.usbserial-FTFBPHDT', zFieldGain)
+#zCoil = coil.Coil('/dev/tty.usbserial-FTFBPHDT', zFieldGain)
 
 
 def openPorts():
@@ -33,7 +36,7 @@ def openPorts():
     # open the powersupply serial ports
     xCoil.supply.openPort()
     yCoil.supply.openPort()
-    zCoil.supply.openPort()
+    #zCoil.supply.openPort()
     print('opened all three powersupplies')
 
     # open the labjack serial port
@@ -50,7 +53,7 @@ def closePorts(handle):
     # pass in the labjack handle so we don't have to open it on import
     xCoil.supply.closePort()
     yCoil.supply.closePort()
-    zCoil.supply.closePort()
+    #zCoil.supply.closePort()
     print('closed all three powersupplies')
 
     ljm.close(handle)
@@ -73,8 +76,42 @@ def fine_field_cart(xField, yField, zField, handle):
     names = [xCoil.dacName, yCoil.dacName]
     analogValues = [xCoil.dacVoltage, yCoil.dacVoltage] # [2.5 V, 12345]
     ljm.eWriteNames(handle, numFrames, names, analogValues)
-    return
+    return"""
 
+def fine_field_cart(xField, yField, handle):
+    '''
+    Set powersupplies to the proper current for each coil
+    and set the DACs to the correct voltage with the labjack.
+    '''
+    t0 = time.time()
+    # create the thread objects to handle the serial wait times
+    xThread = threading.Thread(target= xCoil.setField, args= [xField])
+    yThread = threading.Thread(target= yCoil.setField, args= [yField])
+    #zThread = threading.Thread(target= zCoil.setField, args= zField)
+
+    # start the threads()
+    xThread.start()
+    yThread.start()
+    #zThread.start()
+
+    # now adust the adustment coils with the labjack
+    # Setup and call eWriteNames to write values to the LabJack.
+    numFrames = 2
+    names = [xCoil.dacName, yCoil.dacName]
+    analogValues = [xCoil.dacVoltage, yCoil.dacVoltage] # [2.5 V, 12345]
+    ljm.eWriteNames(handle, numFrames, names, analogValues)
+
+    # wait for the threads to finish before moving on
+    # (prevent thread duplication in an additional call)
+    xThread.join()
+    yThread.join()
+    #zThread.join()
+
+    t1 = time.time()
+    #print('total time between = %s' % (t1-t0))
+    #print('total time between = {0}'.format(t1-t0)) #
+
+    return
 
 def field_cart(xField, yField, zField):
     """
