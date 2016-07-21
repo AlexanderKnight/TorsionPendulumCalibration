@@ -68,10 +68,10 @@ class PowerSupply():
             return(out) # returns a string (error message or text reply to command)
 
     def parseErrorMessages(self, message):
-        '''
+        """
         Check the input message for any of the predefined error messages from the powersupply
         and raise an exception if an error is found.
-        '''
+        """
         if message == 'Syntax Error':
             #print('Syntax Error. Command not a number or value too high for the power supply')
             raise Exception('Syntax Error. Command not a number or value too high for the power supply')
@@ -83,10 +83,10 @@ class PowerSupply():
             raise Exception('strange message receved: %s' % message)
 
     def checkMode(self):
-        '''
+        """
         Test to see if the supply is in constant current mode or constant voltage mode
         returns a string 'CV' if constant voltage and 'CC' if the mode is constant current.
-        '''
+        """
         out = self.writeToPort(bytearray('STAT?', 'utf-8'))
         if out == 'CV' or out == 'CC': # if we get expected values for the mode
             return out # return them!
@@ -95,10 +95,10 @@ class PowerSupply():
             raise Exception('enable the exceptions in the parseErrorMessages functon!')
 
     def voltage(self, setVoltage = 'None'):
-        '''
+        """
         If no arguments are passed, this function queries the voltage and returns it.
         otherwise it will try to set the voltage of the powersupply and return a None type.
-        '''
+        """
 
         #if(self.checkMode() != 'CV'): # check the mode of the powersupply
         #     raise Exception('Incorrect mode! Supply is in constant current mode.')
@@ -127,7 +127,7 @@ class PowerSupply():
         return(out)
 
     def current(self, setCurrent = 'None'):
-        '''
+        """
         If no arguments are passed this function queries the current and returns it.
         otherwise it will try to set the current of the powersupply and return a None type.
         This is very similar to the voltage() function but has slightly differet formatting.
@@ -136,7 +136,7 @@ class PowerSupply():
         (minimum precision = 0.1 mA).
 
         The returned current float is also in AMPS.
-        '''
+        """
 
         #if(self.checkMode() != 'CC'): # make sure the supply is in constant current mode.
         #    raise Exception('Incorrect mode! Supply is in constant voltage mode.')
