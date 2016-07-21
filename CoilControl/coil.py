@@ -3,9 +3,9 @@ sys.path.append("./../PowerSupplyControl/")
 import powersupply
 
 class Coil:
-    '''
+    """
     parent class for a coil that is attached to a BK powersupply
-    '''
+    """
     def __init__(self, powersupplyAddress, largeCoilFieldGain):
         # assign the correct port address to a powersupply objectsupply
         self.supply = powersupply.PowerSupply(powersupplyAddress)
@@ -28,9 +28,9 @@ class Coil:
         return
 
     def setLargeCoilField(self, fieldValue):
-        '''
+        """
         Calculates the current required for the specified field.
-        '''
+        """
         if fieldValue != self.largeCoilField: # prevents setting the coil with the same value
             # calculate the current from the field value
             current = fieldValue / self.largeCoilFieldGain
@@ -47,9 +47,9 @@ class Coil:
         return
 
 class CoilWithCorrection(Coil):
-    '''
+    """
     coil with additional correction coil controlled by the labjack
-    '''
+    """
     def __init__(self, powersupplyAddress, largeCoilFieldGain, dacName, smallCoilFieldGain):
 
         Coil.__init__(self, powersupplyAddress, largeCoilFieldGain)
@@ -69,24 +69,24 @@ class CoilWithCorrection(Coil):
         return
 
     def setSmallCoilField(self, fieldValue):
-        '''
+        """
         sets the adustmetn coils to the specified value.
         the adustment coils only work in one direction and add to the field
         of the large coils.
         due to the constraints of the labjack serial link, this function
         only sets the local variable 'smallCoilVoltage' which can later
         be passed to the labjack with the other DAC setting to minimize comunication time
-        '''
+        """
         self.smallFieldValue = fieldValue # update the field container
         current = fieldValue / self.smallCoilFieldGain.n # calculate the current from the field gain
         self.dacVoltage = current * self.voltageGain # V = I*R
 
     def setField(self, fieldValue):
-        '''
+        """
         set both the small and large coils.
         use the large coils to get in range of the desired value,
         and the small ones to precisely set the field.
-        '''
+        """
         # calculate the smallest field that the large coil can produce with the
         # powersupplies. This will be the unit that we use to calculate avalable ranges.
         minimumLargeCoilFieldStep = self.minPowerSupplyCurrentStep * self.largeCoilFieldGain

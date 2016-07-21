@@ -29,6 +29,7 @@ zCoil = coil.Coil('/dev/tty.usbserial-FTFBPHDT', zFieldGain)
 
 
 def openPorts():
+    """Open all the ports including the labjack and the powersupplies"""
     # open the powersupply serial ports
     xCoil.supply.openPort()
     yCoil.supply.openPort()
@@ -45,6 +46,7 @@ def openPorts():
     return(handle) # return the handle so e can close it later
 
 def closePorts(handle):
+    """close all the ports including the labjack and the powersupplies"""
     # pass in the labjack handle so we don't have to open it on import
     xCoil.supply.closePort()
     yCoil.supply.closePort()
@@ -57,10 +59,10 @@ def closePorts(handle):
 
 # define field setting functions
 def fine_field_cart(xField, yField, zField, handle):
-    '''
+    """
     Set powersupplies to the proper current for each coil
     and set the DACs to the correct voltage with the labjack.
-    '''
+    """
     xCoil.setField(xField)
     yCoil.setField(yField)
     zCoil.setLargeCoilField(zField)
@@ -75,10 +77,10 @@ def fine_field_cart(xField, yField, zField, handle):
 
 
 def field_cart(xField, yField, zField):
-    '''
+    """
     Corsely set the coils using the large powersupplies only.
     (avoid using the adustment coils)
-    '''
+    """
     xCoil.setLargeCoilField(xField)
     yCoil.setLargeCoilField(yField)
     zCoil.setLargeCoilField(zField)
@@ -89,11 +91,11 @@ def field_cart(xField, yField, zField):
 
 
 def fine_field_cart_rotation(xField, yField, zField, phi, handle):
-    '''
+    """
     Rotate a the cordinate system about the z axis
     so we can allign our control components to be perpendicular
     and parallel to the optical zero.
-    '''
+    """
     # do a rotation about the z axis.
     xFieldPrime = xField * math.cos(phi) + yField * math.sin(phi)
     yFieldPrime = yField * math.cos(phi) - xField * math.sin(phi)
@@ -102,7 +104,7 @@ def fine_field_cart_rotation(xField, yField, zField, phi, handle):
 
     return
 
-"""def pid_duration(kP, kI, kD, durationInSeconds, labjackHandle):
+'''def pid_duration(kP, kI, kD, durationInSeconds, labjackHandle):
     startTime = time.time() # time stamp to start the clock
     # load in the field values for the coils
-    xField = self."""
+    xField = self.'''
