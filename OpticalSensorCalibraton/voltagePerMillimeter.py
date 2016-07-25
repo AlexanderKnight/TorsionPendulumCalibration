@@ -1,11 +1,10 @@
 """
-In this file we want to generate a text file that will let us calibrate the optical sensor and determine its angular resolution.
+In this program we want to generate a text file that will let us calibrate the optical sensor and determine its angular resolution.
 we are going to be reading from the z-axis sensor (top-bottom) and cranking the optical stage
 through the full range of the quadrent sensor.
 
 we can read the sensor signal automaticly with the labjack, but we need to ask the user
-for the stage position. we can ease the process by asking the user to set the stage to a value and then taking a reading,
-but we wnat to keep it simple.
+for the stage position. we can ease the process by asking the user to set the stage to a value and then taking a reading.
 """
 
 # imports
@@ -50,7 +49,7 @@ try:
 
     END_STAGE_POSITION = float(input('set the END_STAGE_POSITION in mm \n -->'))
 
-    NUMBER_OF_DATA_POINTS = float(input('How manny data points? \n -->')) + 1
+    NUMBER_OF_DATA_POINTS = float(input('How manny data points? \n -->')) + 1 # plus one because people always forget that 0 is a datapoint
 
     stagePositions = np.linspace(STARTING_STAGE_POSITION, END_STAGE_POSITION, NUMBER_OF_DATA_POINTS)
     print(stagePositions)
