@@ -75,10 +75,10 @@ try:
             print("  1st scan out of %i: %s" % (scans, ainStr))
             print("  Scans Skipped = %0.0f, Scan Backlogs: Device = %i, LJM = " \
                   "%i" % (curSkip/numAddresses, ret[1], ret[2]))
-            # append the data to the data List
 
-            rawData = np.reshape(data, (-1,NUMBER_OF_AINS)) # reshape the data to have each row be a different reading
-            print(rawData,'\n')
+            newDataChunk = np.reshape(data, (-1,NUMBER_OF_AINS)) # reshape the data to have each row be a different reading
+            rawData = np.vstack((rawData, newDataChunk)) # append the data to the data List
+            #print(rawData,'\n')
 
             i += 1
 
@@ -121,6 +121,14 @@ xyz.closePorts(handle)
 print('closed all the ports\n')
 
 
+def package_my_data_into_a_dataframe_yay(data): # feel more than free to change the name of this function
+    """Takes a three column dataset in numpy array form and packaages it into a dataFrame"""
+    dataFrame = pd.DataFrame({'leftMinusRight': data[:,0], 'Sum': data[:,1], 'TopMinusBottom': data[:,2]})
+    return dataFrame
+
+print("saving dataFrame")
+dataFrame = package_my_data_into_a_dataframe_yay(rawData)
+dataFrame.to_csv("./data/freequencyVsField/testData.csv")
 
 
 #data = pd.DataFrame({'Time': [0,1,2,3,4,5], 'Sum':[5,5,5,5,0,3]}, index = [0,1,3,4,6,7]) #
