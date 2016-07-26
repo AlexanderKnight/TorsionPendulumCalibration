@@ -17,4 +17,6 @@ TorsionPendulumCalibration
    xyzFieldControl
    powersupply
    powersupplyTestCases
+   test
+
 
