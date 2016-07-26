@@ -12,8 +12,8 @@ handle = xyz.openPorts()
 
 steps = 1000
 print(xyz.xCoil.appliedMinField, xyz.xCoil.appliedMaxField, xyz.yCoil.appliedMinField, xyz.yCoil.appliedMaxField)
-Bx = np.linspace(xyz.xCoil.appliedMaxField, xyz.xCoil.appliedMinField, 3) # start frim the high field
-By = np.linspace(xyz.yCoil.appliedMinField, xyz.yCoil.appliedMaxField, 12000)
+Bx = np.linspace(xyz.xCoil.appliedMaxField, xyz.xCoil.appliedMinField, 7) # start from the high field
+By = np.linspace(xyz.yCoil.appliedMinField, xyz.yCoil.appliedMaxField, 20000)
 #Bz = np.linspace(56.0, 62.0, 200)
 
 
@@ -23,7 +23,7 @@ minSumSignal = 3.0
 sumSignal = []
 
 # analog input to read from the labjack
-analogInputName = 'AIN0'
+analogInputName = 'AIN1'
 
 
 try:
@@ -48,6 +48,8 @@ except KeyboardInterrupt:
     print('\n')
     xyz.closePorts(handle)
     print('closed all the ports')
+    timeStamp = time.strftime('%m_%d_%y_%H_%M_%S')
+    np.savetxt(timeStamp+'quadtrantSearchData.txt', sumSignal) # save the data
     raise
 
 except Exception as e:
