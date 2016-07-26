@@ -12,7 +12,9 @@ MAX_REQUESTS = 50 # The number of eStreamRead calls that will be performed.
 FIRST_AIN_CHANNEL = 0 #AIN0
 NUMBER_OF_AINS = 3 # AIN0: L-R, AIN1: Sum, AIN2: T-B
 
-rawData = [0,0,0]
+rawData = [0,0,0,0,0,0]
+
+rawDataWithFieldValues =
 
 # open the all ports and get the labjack handle
 handle = xyz.openPorts()
@@ -43,8 +45,9 @@ try:
                                               #0 (default)
     ljm.eWriteNames(handle, len(aNames), aNames, aValues)
 
-
+    eventNumber = 0 # keeps track of the event we make a new one each time the user resets the pendulum and hits enter
     while True:
+
         # Configure and start stream
         scanRate = ljm.eStreamStart(handle, scansPerRead, numAddresses, aScanList, scanRate)
         print("\nStream started with a scan rate of %0.0f Hz." % scanRate)
@@ -55,6 +58,11 @@ try:
         totSkip = 0 # Total skipped samples
 
         i = 1 # counter for number of stream requests
+
+        # update the powersupply field readings so we can reference them later
+        xyz.xCoil.getLargeCoilField()
+        xyz.yCoil.getLargeCoilField()
+
         while i <= MAX_REQUESTS:
             ret = ljm.eStreamRead(handle)
 
@@ -77,6 +85,10 @@ try:
                   "%i" % (curSkip/numAddresses, ret[1], ret[2]))
 
             newDataChunk = np.reshape(data, (-1,NUMBER_OF_AINS)) # reshape the data to have each row be a different reading
+
+            # add on the field value columns and eventNumber to newDataChunk.
+            for i, row in enumerate(newDataChunk):
+                row = np.append(row, [xyz.xCoil.largeCoilField, xyz.yCoil.largeCoilField, eventNumber]) # for now we aren't using the adustment coils
             rawData = np.vstack((rawData, newDataChunk)) # append the data to the data List
             #print(rawData,'\n')
 
@@ -96,7 +108,8 @@ try:
         print("\nStop Stream")
         ljm.eStreamStop(handle)
 
-        input("press enter to start a new scan")
+        input("finished with eventNumber %s. Press enter to start a new data run." % eventNumber)
+        eventNumber += 1 # increment the event number
 
 except ljm.LJMError:
     ljme = sys.exc_info()[1]
@@ -112,6 +125,9 @@ except Exception as e:
     # helpful to close the ports on except when debugging the code.
     # it prevents the devices from thinking they are still conected and refusing the new connecton
     # on the next open ports call.
+    print("saving dataFrame")
+    dataFrame = package_my_data_into_a_dataframe_yay(rawData)
+    dataFrame.to_csv("./data/freequencyVsField/testData.csv")
     xyz.closePorts(handle)
     print('closed all the ports\n')
     print(e) # print the exception
@@ -122,8 +138,13 @@ print('closed all the ports\n')
 
 
 def package_my_data_into_a_dataframe_yay(data): # feel more than free to change the name of this function
-    """Takes a three column dataset in numpy array form and packaages it into a dataFrame"""
-    dataFrame = pd.DataFrame({'leftMinusRight': data[:,0], 'Sum': data[:,1], 'TopMinusBottom': data[:,2]})
+    """Takes a five column dataset in numpy array form and packaages it into a dataFrame"""
+    dataFrame = pd.DataFrame({'leftMinusRight': data[:,0],
+                              'Sum': data[:,1],
+                              'TopMinusBottom': data[:,2],
+                              'xField': data[:,3],
+                              'yField': data[:,4],
+                              'Event': data[:,5]})
     return dataFrame
 
 print("saving dataFrame")
