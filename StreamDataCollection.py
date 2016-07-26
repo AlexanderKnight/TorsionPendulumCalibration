@@ -149,7 +149,7 @@ def package_my_data_into_a_dataframe_yay(data): # feel more than free to change 
 
 print("saving dataFrame")
 dataFrame = package_my_data_into_a_dataframe_yay(rawData)
-dataFrame.to_csv("./data/freequencyVsField/testData.csv")
+dataFrame.to_csv("./data/frequencyVsField/testData.csv")
 
 
 #data = pd.DataFrame({'Time': [0,1,2,3,4,5], 'Sum':[5,5,5,5,0,3]}, index = [0,1,3,4,6,7]) #
