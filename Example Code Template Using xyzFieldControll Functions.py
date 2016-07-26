@@ -9,20 +9,17 @@ import xyzFieldControl as xyz
 handle = xyz.openPorts()
 
 try:
-    # run your code here!
+    # all labjack code in this try/except you could put all your code here!
     while True:
         print("hi")
-
-
-except KeyboardInterrupt:
-	print('\n')
-	xyz.closePorts(handle)
-	print('closed all the ports')
 
 except Exception as e:
 	# helpful to close the ports on except when debugging the code.
     # it prevents the devices from thinking they are still conected and refusing the new connecton
     # on the next open ports call.
 	xyz.closePorts(handle)
-	print('closed all the ports')
+	print('closed all the ports\n')
 	print(e) # print the exception
+
+xyz.closePorts(handle)
+print('closed all the ports\n')
