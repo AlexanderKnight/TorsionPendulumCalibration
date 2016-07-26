@@ -12,9 +12,7 @@ MAX_REQUESTS = 50 # The number of eStreamRead calls that will be performed.
 FIRST_AIN_CHANNEL = 0 #AIN0
 NUMBER_OF_AINS = 3 # AIN0: L-R, AIN1: Sum, AIN2: T-B
 
-rawData = [0,0,0,0,0,0]
-
-rawDataWithFieldValues =
+rawData = [0,0,0,0,0,0] # cols are leftMinusRight, Sum, TopMinusBottom, xField, yField, eventNumber
 
 # open the all ports and get the labjack handle
 handle = xyz.openPorts()
@@ -88,7 +86,8 @@ try:
 
             # add on the field value columns and eventNumber to newDataChunk.
             for i, row in enumerate(newDataChunk):
-                row = np.append(row, [xyz.xCoil.largeCoilField, xyz.yCoil.largeCoilField, eventNumber]) # for now we aren't using the adustment coils
+                newDataChunk[i] = np.append(row, [xyz.xCoil.largeCoilField, xyz.yCoil.largeCoilField, eventNumber]) # for now we aren't using the adustment coils
+            print(newDataChunk)
             rawData = np.vstack((rawData, newDataChunk)) # append the data to the data List
             #print(rawData,'\n')
 
