@@ -32,7 +32,7 @@ def package_my_data_into_a_dataframe_yay(data): # feel more than free to change 
     return dataFrame
 
 
-MAX_REQUESTS = 3 # The number of eStreamRead calls that will be performed.
+MAX_REQUESTS = 60 # The number of eStreamRead calls that will be performed.
 FIRST_AIN_CHANNEL = 0 #AIN0
 NUMBER_OF_AINS = 3 # AIN0: L-R, AIN1: Sum, AIN2: T-B
 
@@ -70,9 +70,7 @@ try:
     eventNumber = 0 # keeps track of the event we make a new one each time the user resets the pendulum and hits enter
     while True:
 
-        # update the powersupply field readings so we can reference them later
-        xyz.xCoil.getLargeCoilField()
-        xyz.yCoil.getLargeCoilField()
+
 
         # Configure and start stream
         scanRate = ljm.eStreamStart(handle, scansPerRead, numAddresses, aScanList, scanRate)
@@ -82,6 +80,12 @@ try:
         start = datetime.now()
         totScans = 0
         totSkip = 0 # Total skipped samples
+
+        print('current querry!')
+        # update the powersupply field readings so we can reference them later
+        xyz.xCoil.getLargeCoilField()
+        xyz.yCoil.getLargeCoilField()
+        print('done with current querry!')
 
         i = 1 # counter for number of stream requests
 
