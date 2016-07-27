@@ -46,6 +46,15 @@ class Coil:
 
         return
 
+    def getLargeCoilField(self):
+        """updates the internal field value.
+        Usefull for when the powersupply was adusted manually
+        and we want to read the new field value
+        """
+        self.largeCoilCurrent = self.supply.current() # query the current
+        # use the new current to update the field value:
+        self.largeCoilField = self.largeCoilCurrent * self.largeCoilFieldGain
+
 class CoilWithCorrection(Coil):
     """
     coil with additional correction coil controlled by the labjack
