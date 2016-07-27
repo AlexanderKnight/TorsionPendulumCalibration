@@ -1,28 +1,22 @@
 import numpy as np
-import scipy as sp
+import pandas as pd
 
-def periodCalc (file, sumCrop=1.0):
+def periodCalc (data, sumCrop=1.0):
 
-    data = np.genfromtxt(file, delimiter=',')
-    time = data[:,0]
-    sumSignal = data[:,1]
-    leftRightSignal = data[:,2]
+    crossingsIndex=[]
+    for i in range(1,len(data.index)):
+        if ((data.LR[i]>0.0 and data.LR[i-1]<0.0)
+        or (data.LR[i]<0.0 and data.LR[i-1]>0.0)):
+            crossingsIndex.append(i)
+            crossingsIndex.append(i-1)
 
-    crossings = []
-    rising = False
-    for i,e in enumerate(time):
+    for i in crossingsIndex:
+        data.crossings[i] = True
 
-        if sumsig >= sumCrop
-        and ((leftRightSignal[i]>0.0
-        and leftRightSignal[i-1]<0.0)
-        or (leftRightSignal[i]<0.0
-        and leftRightSignal[i-1]>0.0)):
-            if abs(leftRightSignal[i])<abs(leftRightSignal[i-1]):
-                crossings.append(time[i])
-            else:
-                crossings.append(time[i-1])
+    newdata = data[data.sumSignal >= sumCrop]
+    newdata = newdata.reset_index()
     periods = []
-    for i,e in enumerate(crossings):
-        periods.append(crossings[i+2]-e)
+    for i in range(2, len(newdata.index)):
+        periods.append(newdata.time[i]-newdata.time[i-2])
 
     return periods
