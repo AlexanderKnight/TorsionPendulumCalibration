@@ -8,11 +8,35 @@ import sys
 from datetime import datetime
 import numpy as np
 
-MAX_REQUESTS = 50 # The number of eStreamRead calls that will be performed.
+# dataframe packing function
+def package_my_data_into_a_dataframe_yay(data): # feel more than free to change the name of this function
+    """Takes a five column dataset in numpy array form and packaages it into a dataFrame"""
+    dataFrame = pd.DataFrame({'leftMinusRight': data[:,0],
+                              'sumSignal': data[:,1],
+                              'topMinusBottom': data[:,2],
+                              'xField': data[:,3],
+                              'yField': data[:,4],
+                              'eventNumber': data[:,5]})
+
+    # append a time column that is calculated from the scan rate
+
+    # length
+    length = len(dataFrame.index)
+    time = []
+    for i in range(length):
+        timestamp = i * (1.0/scanRate)
+        time.append(timestamp)
+
+    dataFrame['timeStamp'] = time
+
+    return dataFrame
+
+
+MAX_REQUESTS = 3 # The number of eStreamRead calls that will be performed.
 FIRST_AIN_CHANNEL = 0 #AIN0
 NUMBER_OF_AINS = 3 # AIN0: L-R, AIN1: Sum, AIN2: T-B
 
-rawData = [0,0,0,0,0,0] # cols are leftMinusRight, Sum, TopMinusBottom, xField, yField, eventNumber
+rawData = []
 
 # open the all ports and get the labjack handle
 handle = xyz.openPorts()
@@ -46,6 +70,10 @@ try:
     eventNumber = 0 # keeps track of the event we make a new one each time the user resets the pendulum and hits enter
     while True:
 
+        # update the powersupply field readings so we can reference them later
+        xyz.xCoil.getLargeCoilField()
+        xyz.yCoil.getLargeCoilField()
+
         # Configure and start stream
         scanRate = ljm.eStreamStart(handle, scansPerRead, numAddresses, aScanList, scanRate)
         print("\nStream started with a scan rate of %0.0f Hz." % scanRate)
@@ -56,10 +84,6 @@ try:
         totSkip = 0 # Total skipped samples
 
         i = 1 # counter for number of stream requests
-
-        # update the powersupply field readings so we can reference them later
-        xyz.xCoil.getLargeCoilField()
-        xyz.yCoil.getLargeCoilField()
 
         while i <= MAX_REQUESTS:
             ret = ljm.eStreamRead(handle)
@@ -84,15 +108,15 @@ try:
 
             newDataChunk = np.reshape(data, (-1,NUMBER_OF_AINS)) # reshape the data to have each row be a different reading
 
-            # add on the field value columns and eventNumber to newDataChunk.
-            for i, row in enumerate(newDataChunk):
-                newDataChunk[i] = np.append(row, [xyz.xCoil.largeCoilField, xyz.yCoil.largeCoilField, eventNumber]) # for now we aren't using the adustment coils
-            print(newDataChunk)
-            rawData = np.vstack((rawData, newDataChunk)) # append the data to the data List
+            if i != 1: # if we are not on the first run.
+                rawData = np.vstack((rawData, newDataChunk))
+            else:
+                rawData = newDataChunk # this should only run on the first time.
+                #print('FIRST RUN THROUGH')
+
             #print(rawData,'\n')
 
             i += 1
-
 
         end = datetime.now()
 
@@ -107,6 +131,29 @@ try:
         print("\nStop Stream")
         ljm.eStreamStop(handle)
 
+        # format data to include field values
+        rawDataWithFieldValues = []
+        for j, row in enumerate(rawData): # setp throuh and append the field values to each datapoint
+            rowWithFieldValues = np.append(row, np.array([xyz.xCoil.largeCoilField, xyz.yCoil.largeCoilField, eventNumber])) # for now we aren't using the adustment coils
+            if j > 0: # not on the first loop
+                rawDataWithFieldValues = np.vstack((rawDataWithFieldValues, rowWithFieldValues))
+            else:
+                rawDataWithFieldValues = rowWithFieldValues
+        print(np.shape(rawDataWithFieldValues))
+
+        # and add it to our master data array
+        if eventNumber != 0:
+            #print(np.shape(allTheData))
+            #print('--------')
+            #print(np.shape(rawDataWithFieldValues))
+            allTheData = np.vstack((allTheData, rawDataWithFieldValues))
+            #print(np.shape(allTheData))
+        else:
+            allTheData = rawDataWithFieldValues
+
+        print(allTheData)
+        print(np.shape(allTheData))
+
         input("finished with eventNumber %s. Press enter to start a new data run." % eventNumber)
         eventNumber += 1 # increment the event number
 
@@ -116,42 +163,23 @@ except ljm.LJMError:
     #xyz.closePorts(handle)
 
 except KeyboardInterrupt: # usefull to have a KeyboardInterrupt when your're debugging
-    #xyz.closePorts(handle)
+    xyz.closePorts(handle)
     # save the data to a DataFrame
-    print(rawData)
+    print("saving dataFrame")
+    dataFrame = package_my_data_into_a_dataframe_yay(allTheData)
+    #dataFrame.to_csv("./data/frequencyVsField/testData.csv")
+
+    # generate timestamp
+    timeStamp1 = time.strftime('%y-%m-%d~%H-%M-%S')
+    dataFrame.to_csv("./data/frequencyVsField/freqVsField%s.csv" % timeStamp1)
+
 
 except Exception as e:
     # helpful to close the ports on except when debugging the code.
     # it prevents the devices from thinking they are still conected and refusing the new connecton
     # on the next open ports call.
-    print("saving dataFrame")
-    dataFrame = package_my_data_into_a_dataframe_yay(rawData)
-    dataFrame.to_csv("./data/freequencyVsField/testData.csv")
+
     xyz.closePorts(handle)
     print('closed all the ports\n')
     print(e) # print the exception
     raise
-
-xyz.closePorts(handle)
-print('closed all the ports\n')
-
-
-def package_my_data_into_a_dataframe_yay(data): # feel more than free to change the name of this function
-    """Takes a five column dataset in numpy array form and packaages it into a dataFrame"""
-    dataFrame = pd.DataFrame({'leftMinusRight': data[:,0],
-                              'Sum': data[:,1],
-                              'TopMinusBottom': data[:,2],
-                              'xField': data[:,3],
-                              'yField': data[:,4],
-                              'Event': data[:,5]})
-    return dataFrame
-
-print("saving dataFrame")
-dataFrame = package_my_data_into_a_dataframe_yay(rawData)
-dataFrame.to_csv("./data/frequencyVsField/testData.csv")
-
-
-#data = pd.DataFrame({'Time': [0,1,2,3,4,5], 'Sum':[5,5,5,5,0,3]}, index = [0,1,3,4,6,7]) #
-
-#print(data)
-#data.to_csv("./data/freequencyVsField/test.csv")
