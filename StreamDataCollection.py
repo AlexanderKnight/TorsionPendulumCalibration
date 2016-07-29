@@ -33,7 +33,7 @@ def package_my_data_into_a_dataframe_yay(data): # feel more than free to change 
     return dataFrame
 
 
-def kick(xKick, ykick, zKick, waitTime, handle):
+def kickUpAndWait(xKick, yKick, zKick, waitTime):
     """
     kick the y supply by 100 milliamps for 3 seconds then
     reset the values to their old settings.
@@ -46,16 +46,17 @@ def kick(xKick, ykick, zKick, waitTime, handle):
     zField = xyz.zCoil.getLargeCoilField()
 
     # kick the y field:
-    xyz.field_cart(xField+xKick, yField+yKick, zField+zKick, handle)
+    xyz.field_cart(xField+xKick, yField+yKick, zField+zKick)
 
     # wait for waitTime
     time.sleep(waitTime)
 
-    # set the field back to normal
-    xyz.field_cart(xField, yField, zField, handle)
+    return(xField, yField, zField)
 
+def kickDown(xField, yField, zField):
+
+    xyz.field_cart(xField, yField, zField)
     return
-
 
 
 MAX_REQUESTS = 60 # The number of eStreamRead calls that will be performed.
@@ -97,13 +98,20 @@ try:
     input('start?')
     while True:
 
-
+        # kick the pendulum to drive it so we can take period data.
+        print('Kicking')
+        xr,yr,zr = kickUpAndWait(0, 4.5e-6, 0, 10) # kick the field and save the current values.
 
         # Configure and start stream
         scanRate = ljm.eStreamStart(handle, scansPerRead, numAddresses, aScanList, scanRate)
         print("\nStream started with a scan rate of %0.0f Hz." % scanRate)
 
         print("\nPerforming %i stream reads." % MAX_REQUESTS)
+
+        kickDown(xr,yr,zr) # put the currents back to where they were
+        print('Done Kicking!')
+
+        # then do the stream.
         start = datetime.now()
         totScans = 0
         totSkip = 0 # Total skipped samples
@@ -209,8 +217,17 @@ except Exception as e:
     # helpful to close the ports on except when debugging the code.
     # it prevents the devices from thinking they are still conected and refusing the new connecton
     # on the next open ports call.
-
     xyz.closePorts(handle)
     print('closed all the ports\n')
+    
+    print("saving dataFrame")
+    dataFrame = package_my_data_into_a_dataframe_yay(allTheData)
+    #dataFrame.to_csv("./data/frequencyVsField/testData.csv")
+
+    # generate timestamp
+    timeStamp1 = time.strftime('%y-%m-%d~%H-%M-%S')
+    dataFrame.to_csv("./data/frequencyVsField/freqVsField%s.csv" % timeStamp1)
+
+
     print(e) # print the exception
     raise
