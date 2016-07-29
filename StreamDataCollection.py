@@ -18,6 +18,7 @@ def package_my_data_into_a_dataframe_yay(data): # feel more than free to change 
                               'yField': data[:,4],
                               'eventNumber': data[:,5]})
 
+
     # append a time column that is calculated from the scan rate
 
     # length
@@ -30,6 +31,31 @@ def package_my_data_into_a_dataframe_yay(data): # feel more than free to change 
     dataFrame['timeStamp'] = time
 
     return dataFrame
+
+
+def kick(xKick, ykick, zKick, waitTime, handle):
+    """
+    kick the y supply by 100 milliamps for 3 seconds then
+    reset the values to their old settings.
+    takes: values in field to kick by, and time to wait before
+    setting the field back to normal.
+    """
+    # update the field values
+    xField = xyz.xCoil.getLargeCoilField()
+    yField = xyz.yCoil.getLargeCoilField()
+    zField = xyz.zCoil.getLargeCoilField()
+
+    # kick the y field:
+    xyz.field_cart(xField+xKick, yField+yKick, zField+zKick, handle)
+
+    # wait for waitTime
+    time.sleep(waitTime)
+
+    # set the field back to normal
+    xyz.field_cart(xField, yField, zField, handle)
+
+    return
+
 
 
 MAX_REQUESTS = 60 # The number of eStreamRead calls that will be performed.
@@ -68,6 +94,7 @@ try:
     ljm.eWriteNames(handle, len(aNames), aNames, aValues)
 
     eventNumber = 0 # keeps track of the event we make a new one each time the user resets the pendulum and hits enter
+    input('start?')
     while True:
 
 
@@ -80,12 +107,6 @@ try:
         start = datetime.now()
         totScans = 0
         totSkip = 0 # Total skipped samples
-
-        print('current querry!')
-        # update the powersupply field readings so we can reference them later
-        xyz.xCoil.getLargeCoilField()
-        xyz.yCoil.getLargeCoilField()
-        print('done with current querry!')
 
         i = 1 # counter for number of stream requests
 
@@ -134,6 +155,12 @@ try:
 
         print("\nStop Stream")
         ljm.eStreamStop(handle)
+
+        print('current querry!')
+        # update the powersupply field readings so we can reference them later
+        xyz.xCoil.getLargeCoilField()
+        xyz.yCoil.getLargeCoilField()
+        print('done with current querry!')
 
         # format data to include field values
         rawDataWithFieldValues = []

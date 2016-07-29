@@ -55,6 +55,8 @@ class Coil:
         # use the new current to update the field value:
         self.largeCoilField = self.largeCoilCurrent * self.largeCoilFieldGain
 
+        return self.largeCoilField
+
 class CoilWithCorrection(Coil):
     """
     coil with additional correction coil controlled by the labjack
