@@ -92,7 +92,7 @@ def fine_field_cart(xField, yField, zField, handle):
     # create the thread objects to handle the serial wait times
     xThread = threading.Thread(target= xCoil.setField, args= [xField])
     yThread = threading.Thread(target= yCoil.setField, args= [yField])
-    zThread = threading.Thread(target= zCoil.setField, args= [zField])
+    zThread = threading.Thread(target= zCoil.setLargeCoilField, args= [zField])
 
     # start the threads()
     xThread.start()
