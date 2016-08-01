@@ -78,6 +78,3 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
             periodList= pd.concat([periodList,tempdf], ignore_index=True)
 
     return periodList
-
-Data = pd.read_csv('freqVsField16-07-29~16-17-18.csv')
-print(periodCalc(Data))
