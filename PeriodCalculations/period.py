@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from time import sleep
 
-def periodCalc (data, sumCrop=4.5, swingCrop=4.5):
+def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
 
     eventNumbers = data.eventNumber.unique() # checks for unique event numbers
 
@@ -14,12 +15,26 @@ def periodCalc (data, sumCrop=4.5, swingCrop=4.5):
         selectedData = data.loc[data.eventNumber == l] #only checks event number data
         selectedData = selectedData.reset_index()
         #crops end where data is bad
-        for i in reversed(selectedData.leftMinusRight.index):
-            if selectedData.leftMinusRight[i] >= swingCrop \
-            or selectedData.leftMinusRight[i] <= -1*swingCrop:
-                swingCropIndex = i
-                break
-        selectedData = selectedData[selectedData.index <= swingCropIndex]
+        if swingCrop != None:
+            for i in reversed(selectedData.leftMinusRight.index):
+                if selectedData.leftMinusRight[i] >= swingCrop \
+                or selectedData.leftMinusRight[i] <= -1*swingCrop:
+                    CropIndex = i
+                    break
+        if viewGraph:
+            x = selectedData.index
+            y = selectedData.leftMinusRight
+            z = selectedData.sumSignal
+            plt.figure(figsize=(15,12))
+            plt.plot(x,y, 'o')
+            plt.plot(x,z, 'o')
+            plt.xlabel('Index')
+            plt.ylabel('Sum Signal and L-R Signal')
+            plt.show()
+            CropIndex = 1000*int(input('Please enter the end index value for analysis in thousands, \n e.g. 13 for index 13,000 (0 for all): '))
+            if CropIndex == 0:
+                CropIndex = max(selectedData.index)+1
+        selectedData = selectedData[selectedData.index <= CropIndex]
 
         crossingsIndex=[]
         #checks to see if the sign from one element to the next changes, and then
