@@ -118,8 +118,5 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
             tempdf = pd.DataFrame({'eventNumber':l, 'avgPeriod':avgPeriod, 'xField':newdata.xField.mean(), 'yField':newdata.yField.mean()}, index=[0])
             periodList= pd.concat([periodList,tempdf], ignore_index=True)
 
-    
-    return periodList
 
-Data = pd.read_csv('freqVsField16-07-29~16-17-18.csv')
-print(periodCalc(Data))
+    return periodList
