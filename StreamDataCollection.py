@@ -101,7 +101,7 @@ try:
         # kick the pendulum to drive it so we can take period data.
         print('Kicking')
         xr,yr,zr = kickUpAndWait(0, 4.5e-6, 0, 10) # kick the field and save the current values.
-
+        #xr,yr,zr = kickUpAndWait(0, 2e-6, 0, 10) # seems like we maight want a bit less kick
         # Configure and start stream
         scanRate = ljm.eStreamStart(handle, scansPerRead, numAddresses, aScanList, scanRate)
         print("\nStream started with a scan rate of %0.0f Hz." % scanRate)
@@ -202,7 +202,7 @@ except ljm.LJMError:
     #xyz.closePorts(handle)
 
 except KeyboardInterrupt: # usefull to have a KeyboardInterrupt when your're debugging
-    xyz.closePorts(handle)
+
     # save the data to a DataFrame
     print("saving dataFrame")
     dataFrame = package_my_data_into_a_dataframe_yay(allTheData)
@@ -212,14 +212,14 @@ except KeyboardInterrupt: # usefull to have a KeyboardInterrupt when your're deb
     timeStamp1 = time.strftime('%y-%m-%d~%H-%M-%S')
     dataFrame.to_csv("./data/frequencyVsField/freqVsField%s.csv" % timeStamp1)
 
+    xyz.closePorts(handle)
 
 except Exception as e:
     # helpful to close the ports on except when debugging the code.
     # it prevents the devices from thinking they are still conected and refusing the new connecton
     # on the next open ports call.
-    xyz.closePorts(handle)
-    print('closed all the ports\n')
-    
+
+
     print("saving dataFrame")
     dataFrame = package_my_data_into_a_dataframe_yay(allTheData)
     #dataFrame.to_csv("./data/frequencyVsField/testData.csv")
@@ -228,6 +228,8 @@ except Exception as e:
     timeStamp1 = time.strftime('%y-%m-%d~%H-%M-%S')
     dataFrame.to_csv("./data/frequencyVsField/freqVsField%s.csv" % timeStamp1)
 
+    xyz.closePorts(handle)
+    print('closed all the ports\n')
 
     print(e) # print the exception
     raise
