@@ -102,12 +102,16 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
 
         #gets average period
         avgPeriod = np.mean(periods)
+        stdPeriods = np.std(periods)
+        numPeriods = len(periods)
 
         #if first time through loop (usually eventNumber = 0), sets up return
         #database
         if first:
 
-            d = {'eventNumber':l, 'avgPeriod':avgPeriod, 'xField':newdata.xField.mean(), 'yField':newdata.yField.mean()}
+            d = {'eventNumber':l, 'avgPeriod':avgPeriod, 
+                'periodSTD': stdPeriods, 'numPeriods': numPeriods,
+                'xField':newdata.xField.mean(), 'yField':newdata.yField.mean()}
             periodList = pd.DataFrame(d, index=[0])
 
             first=False
@@ -115,7 +119,10 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
         #adds to set up database from above
         else:
 
-            tempdf = pd.DataFrame({'eventNumber':l, 'avgPeriod':avgPeriod, 'xField':newdata.xField.mean(), 'yField':newdata.yField.mean()}, index=[0])
+            tempdf = pd.DataFrame({'eventNumber':l, 'avgPeriod':avgPeriod,
+                                'periodSTD':stdPeriods, 'numPeriods':numPeriods,
+                                'xField':newdata.xField.mean(),
+                                'yField':newdata.yField.mean()}, index=[0])
             periodList= pd.concat([periodList,tempdf], ignore_index=True)
 
 
