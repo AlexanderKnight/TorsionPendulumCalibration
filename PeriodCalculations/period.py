@@ -50,18 +50,24 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
 
         #shows users the data, and asks for index to crop after
         if viewGraph:
-            x = selectedData.index
-            y = selectedData.leftMinusRight
-            z = selectedData.sumSignal
-            plt.figure(figsize=(15,12))
-            plt.plot(x,y, 'o')
-            plt.plot(x,z, 'o')
-            plt.xlabel('Index')
-            plt.ylabel('Sum Signal and L-R Signal')
-            plt.show()
-            CropIndex = 1000*int(input('Please enter the end index value for analysis in thousands, \n e.g. 13 for index 13,000 (0 for all): '))
-            if CropIndex == 0:
-                CropIndex = max(selectedData.index)+1
+            repeat = True
+            while repeat:
+                x = selectedData.index
+                y = selectedData.leftMinusRight
+                z = selectedData.sumSignal
+                plt.figure(figsize=(15,12))
+                plt.plot(x,y, 'o')
+                plt.plot(x,z, 'o')
+                plt.xlabel('Index')
+                plt.ylabel('Sum Signal and L-R Signal')
+                plt.show()
+                try:
+                    CropIndex = 1000*int(input('Please enter the end index value \
+                                for analysis in thousands, \n e.g. 13 for index \
+                                13,000 (0 for all): '))
+                    repeat = False
+                if CropIndex == 0:
+                    CropIndex = max(selectedData.index)+1
 
         #crops index
         selectedData = selectedData[selectedData.index <= CropIndex]
@@ -109,7 +115,7 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
         #database
         if first:
 
-            d = {'eventNumber':l, 'avgPeriod':avgPeriod, 
+            d = {'eventNumber':l, 'avgPeriod':avgPeriod,
                 'periodSTD': stdPeriods, 'numPeriods': numPeriods,
                 'xField':newdata.xField.mean(), 'yField':newdata.yField.mean()}
             periodList = pd.DataFrame(d, index=[0])
