@@ -24,6 +24,8 @@ class Coil:
         self.largeCoilCurrent = self.supply.current() # Amps
         #print(self.largeCoilCurrent, type(self))
         self.largeCoilField = self.largeCoilCurrent * self.largeCoilFieldGain # total field
+        # research type casting later....
+        self.coilField = self.largeCoilField
 
         return
 
