@@ -309,9 +309,9 @@ def pid(setpoint, position, handle, prePos, integral, initialOutput, t0):
     kI = 0.005
     '''
 
-    kP = 0.01
+    kP = 0.001
     kD = 0.05
-    kI = 0.4
+    kI = 0.01
 
 
     #kP = 0.019
@@ -330,9 +330,9 @@ def pid(setpoint, position, handle, prePos, integral, initialOutput, t0):
 
     # only set the integral if it is not saturated
     satVal = 2
-    nextIntegralValue = integral + offset*dt # calculate the next integral so we dont overshoot
+    nextIntegralValue = integral + offset * dt # calculate the next integral so we dont overshoot
     # the three conditions are: (in range), (too low but step will bring us closer), ( too high but step will bring us closer)
-    if (nextIntegralValue < satVal or nextIntegralValue > -1 * satVal) or (nextIntegralValue < -1 * satVal and offset > 0) or (nextIntegralValue > satVal and offset <= 0):
+    if (nextIntegralValue < satVal and nextIntegralValue > -1 * satVal): #  or (nextIntegralValue < -1 * satVal and offset > 0) or (nextIntegralValue > satVal and offset <= 0):
         integral += (offset * dt)
     #integral += (offset*dt)
 
