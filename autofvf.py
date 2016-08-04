@@ -2,9 +2,9 @@
 # script to auto calibrate the magnetic torsion pendulum to get the magnetic
     #moment and torsion constant
 
-import xyzFieldControl as xyzFieldControl
+import xyzFieldControl as xyz
 import sys
-sys.path.append('./PeriodCalculation')
+sys.path.append('./PeriodCalculations/')
 import period
 import time
 

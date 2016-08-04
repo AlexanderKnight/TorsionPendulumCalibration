@@ -66,6 +66,9 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
                                 for analysis in thousands, \n e.g. 13 for index \
                                 13,000 (0 for all): '))
                     repeat = False
+                except:
+                    CropIndex = max(selectedData.index)+1
+                    repeat = False
                 if CropIndex == 0:
                     CropIndex = max(selectedData.index)+1
                     repeat = False
