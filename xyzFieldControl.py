@@ -304,10 +304,14 @@ def pid(setpoint, position, handle, prePos, integral, initialOutput, t0):
     hello this is a doc string
     """
 
-    kP = 0.004
+    '''kP = 0.004
     kD = 0.02
     kI = 0.005
+    '''
 
+    kP = 0.01
+    kD = 0.05
+    kI = 0.4
 
 
     #kP = 0.019
@@ -325,7 +329,9 @@ def pid(setpoint, position, handle, prePos, integral, initialOutput, t0):
     preOffset = prePos - setpoint
 
     # only set the integral if it is not saturated
-    if (integral > -50 and offset > 0) or (integral < 50 and offset <= 0):
+    satVal = 2
+    # the three conditions are: (in range), (too low but step will bring us closer), ( too high but step will bring us closer)
+    if (integral < satVal or integral > -1 * satVal) or (integral < -1 * satVal and offset > 0) or (integral > satVal and offset <= 0):
         integral += (offset * dt)
     #integral += (offset*dt)
 
@@ -584,7 +590,7 @@ def kickTracking(handle, eventNumber, allTheData=None):
         #xyz.closePorts(handle)
 
     except KeyboardInterrupt: # usefull to have a KeyboardInterrupt when your're debugging
-        xyz.closePorts(handle)
+        closePorts(handle)
         # save the data to a DataFrame
         print("saving dataFrame")
         dataFrame = package_my_data_into_a_dataframe_yay(allTheData)
@@ -599,7 +605,7 @@ def kickTracking(handle, eventNumber, allTheData=None):
         # helpful to close the ports on except when debugging the code.
         # it prevents the devices from thinking they are still conected and refusing the new connecton
         # on the next open ports call.
-        xyz.closePorts(handle)
+        closePorts(handle)
         print('closed all the ports\n')
 
         print("saving dataFrame")
