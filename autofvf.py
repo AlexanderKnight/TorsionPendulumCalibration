@@ -7,19 +7,23 @@ import sys
 sys.path.append('./PeriodCalculations/')
 import period
 import time
+import numpy as np
+
 
 handle = xyz.openPorts()
 Bz = xyz.zCoil.coilField
 BxRange = np.linspace(xyz.xCoil.appliedMinField, xyz.xCoil.appliedMaxField, 20)
 eventNumber = 0
-xyz.fine_field_cart(xyz.xCoil.appliedMaxField, xyz.yCoil.appliedMaxField,
+xyz.fine_field_cart(xyz.xCoil.appliedMaxField, 0.82*xyz.yCoil.appliedMaxField,
                     Bz, handle)
+allTheData = None
 try:
-    for x in reverse(BxRange):
+    for x in BxRange[::-1]:
         By = xyz.yCoil.coilField
         xyz.fine_field_cart(x, By, Bz, handle)
-        xyz.beamSearch(searchAxis='y', minSumSignal=4.95)
-        xyz.pidLoop(function='dampen')
+        xyz.beamSearch(searchAxis='y', handle = handle, minSumSignal=3.0, steps=5000)
+        time.sleep(5)
+        xyz.pidLoop(handle, function='dampen')
         if eventNumber == 0:
             currentRun, allTheData = xyz.kickTracking(handle=handle,
                                                     eventNumber = eventNumber)
@@ -48,10 +52,12 @@ try:
 except:
     time.sleep(0.5)
     xyz.closePorts(handle)
-    calibrationRun = xyz.package_my_data_into_a_dataframe_yay(allTheData)
+    if allTheData != None:
+        calibrationRun = xyz.package_my_data_into_a_dataframe_yay(allTheData)
 
-    timeStamp1 = time.strftime('%y-%m-%d~%H-%M-%S')
-    calibrationRun.to_csv("./data/calibration/calibration%s.csv" % timeStamp1)
+        timeStamp1 = time.strftime('%y-%m-%d~%H-%M-%S')
+        calibrationRun.to_csv("./data/calibration/calibration%s.csv" % timeStamp1)
 
-    periodInfo = period.periodCalc(calibrationRun)
-    periodInfo.to_csv('data/calibration/periodInfo%s.csv' % timeStamp1)
+        periodInfo = period.periodCalc(calibrationRun)
+        periodInfo.to_csv('data/calibration/periodInfo%s.csv' % timeStamp1)
+    raise

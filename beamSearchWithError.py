@@ -9,7 +9,7 @@ from labjack import ljm
 import matplotlib.pyplot as plt
 
 # analog input to read from the labjack
-analogInputName = 'AIN0'
+analogInputName = 'AIN1'
 
 # assign the correct port address to each supply
 xCoil = powersupply.PowerSupply('/dev/tty.usbserial-FTBZ1G1B')
