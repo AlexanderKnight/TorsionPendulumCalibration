@@ -5,25 +5,25 @@ from time import sleep
 
 def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
     '''
-    This function takes a pandas dataframe of period data and calculates the
+    This function takes a pandas dataframe of signal data and calculates the
     period from the zero crossings, by event numbers.
 
     input: dataframe with columns=['eventNumber', 'sumSignal',
                                     'leftMinusRight', 'topMinusBotom',
                                     'xField', 'yField', 'timeStamp']
     output: dataframe with columns=['eventNumber', 'avgPeriod',
-                                    'xField', 'yField']
+                                    'xField', 'yField', 'netField']
 
-    Variables=
+    Variables
+    ------------
+    sumCrop(float): value for which all data be ignored if sumSignal is lower than it
 
-    sumCrop: value for which all data be ignored if sumSignal is lower than it
-
-    swingCrop: a +/- value to stop counting when the signal dampens out, checks
+    swingCrop(float/None): a +/- value to stop counting when the signal dampens out, checks
                 backwards, until swingCrop or (-swingCrop) is met by
                 leftMinusRight, and then crops off all data after that index.
                 May not work if the data wanders high or low after good crossings.
 
-    viewGraph: allows the user to see a graph of the leftMinusRight and sumSignal
+    viewGraph(bool): allows the user to see a graph of the leftMinusRight and sumSignal
                 data, and then prompts for a last index value for analysis.
                 Allows for wandering data, as people tend to be better at picking
                 out bad wandering signals than computers.
@@ -68,6 +68,7 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
                     repeat = False
                 if CropIndex == 0:
                     CropIndex = max(selectedData.index)+1
+                    repeat = False
 
         #crops index
         selectedData = selectedData[selectedData.index <= CropIndex]
@@ -117,7 +118,8 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
 
             d = {'eventNumber':l, 'avgPeriod':avgPeriod,
                 'periodSTD': stdPeriods, 'numPeriods': numPeriods,
-                'xField':newdata.xField.mean(), 'yField':newdata.yField.mean()}
+                'xField':newdata.xField.mean(), 'yField':newdata.yField.mean(),
+                'netField':np.sqrt(newdata.xField.mean()**2+newdata.yField.mean()**2)}
             periodList = pd.DataFrame(d, index=[0])
 
             first=False
@@ -128,7 +130,9 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
             tempdf = pd.DataFrame({'eventNumber':l, 'avgPeriod':avgPeriod,
                                 'periodSTD':stdPeriods, 'numPeriods':numPeriods,
                                 'xField':newdata.xField.mean(),
-                                'yField':newdata.yField.mean()}, index=[0])
+                                'yField':newdata.yField.mean(),
+                                'netField':np.sqrt(newdata.xField.mean()**2+newdata.yField.mean()**2)}
+                                , index=[0])
             periodList= pd.concat([periodList,tempdf], ignore_index=True)
 
 
