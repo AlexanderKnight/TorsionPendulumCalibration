@@ -8,6 +8,7 @@ class Application(tk.Frame):
         self.createWidgets()
 
     def createWidgets(self):
+        #Creates magnetic field axis for the x,y, and z axes
         self.XAxisLabel = tk.Label(self, text='X-Axis')
         self.XAxisLabel.grid(row=0)
         self.XAxisValue = tk.DoubleVar()
@@ -16,6 +17,7 @@ class Application(tk.Frame):
         self.XAxisValueEntry.grid(row=0, column=1)
         self.xValue = self.XAxisValue.get()
 
+        #Sets up y axis entry field
         self.yAxisLabel = tk.Label(self, text='Y-Axis')
         self.yAxisLabel.grid(row=1)
         self.yAxisValue = tk.DoubleVar()
@@ -24,6 +26,7 @@ class Application(tk.Frame):
         self.yAxisValueEntry.grid(row=1, column=1)
         self.yValue = self.yAxisValue.get()
 
+        #Sets up z axis entry field
         self.zAxisLabel = tk.Label(self, text='Z-Axis')
         self.zAxisLabel.grid(row=2)
         self.zAxisValue = tk.DoubleVar()
@@ -32,16 +35,18 @@ class Application(tk.Frame):
         self.zAxisValueEntry.grid(row=2, column=1)
         self.zValue = self.zAxisValue.get()
 
+        #Sets up button to take values from axis fields to be magnetic values
         self.setField = tk.Button(self, command=self.SetBField)
         self.setField['text']='Set Magnetic Field'
         self.setField.grid(row=0,column=2)
 
+        #Sets up button to take values from axis fields to be current values
         self.setCurrent = tk.Button(self, command=self.SetCurrent)
         self.setCurrent['text']='Set Current'
         self.setCurrent.grid(row=1,column=2)
 
 
-
+        #Sets up quit button
         self.QUIT = tk.Button(self,text='QUIT', fg='red', command=root.destroy)
         self.QUIT.grid(row=99,column=1)
 
@@ -51,6 +56,7 @@ class Application(tk.Frame):
         except Exception as e:
             raise e
 
+    #sets power supplies to generate field
     def SetBField(self):
         try:
             xyz.fine_field_cart(self.xValue, self.yValue, self.zValue, self.handle)
