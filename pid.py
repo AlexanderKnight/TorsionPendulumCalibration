@@ -22,10 +22,25 @@ if sumSignal == True:
 	#run the pid loop
 '''
 
-def pid(setpoint, position, handle):
-    '''
+
+# open the all ports and get the labjack handle
+handle = xyz.openPorts()
+
+# configure the analog register
+# Setup and call eWriteNames to configure the AIN on the LabJack.
+numFrames = 3
+names = ["AIN0_NEGATIVE_CH", "AIN0_RANGE", "AIN0_RESOLUTION_INDEX"]
+aValues = [199, 0, 10] # setup the analog register values for the labjack
+xyz.ljm.eWriteNames(handle, numFrames, names, aValues)
+
+#lock in the z because we know what it is (don't change it)
+#zCurrent = (xyz.zCoil.largeCoilCurrent)
+
+
+def pid(setpoint, position, handle, initialOutput):
+    """
     hello this is a doc string
-    '''
+    """
 
     kP = 0.004
     kD = 0.005
@@ -59,69 +74,78 @@ def pid(setpoint, position, handle):
 
     # now set the field with the output
     #print('output = %14.11f\toffset = %14.11f\tdt = %14.11f\tintegral = %14.11f' % (output, offset, position, dt, integral))
-    print('offset = %14.11f\tintegral = %14.11f\tderivative = %14.11f\tdt = %14.11f' % (offset, integral, derivative, dt))
-    xyz.fine_field_cart(xyz.xCoil.appliedMaxField, output, handle)
+    print('offset = %14.11f\tintegral = %14.11f\tderivative = %14.11f\tdt = %14.11f'
+	 		% (offset, integral, derivative, dt))
+    xyz.fine_field_cart(xyz.xCoil.coilField, output, handle)
 
-    return
-
-# open the all ports and get the labjack handle
-handle = xyz.openPorts()
-
-# configure the analog register
-# Setup and call eWriteNames to configure the AIN on the LabJack.
-numFrames = 3
-names = ["AIN0_NEGATIVE_CH", "AIN0_RANGE", "AIN0_RESOLUTION_INDEX"]
-aValues = [199, 0, 10] # setup the analog register values for the labjack
-xyz.ljm.eWriteNames(handle, numFrames, names, aValues)
-
-#lock in the z because we know what it is (don't change it)
-#zCurrent = (xyz.zCoil.largeCoilCurrent)
-
-# global variables to be used by the pid loop
-prePos = 0.0 #previous position
-integral = 0.0
-t0 = time.time()
-
-setpoint = 0.0
-
-initialOutput = xyz.yCoil.coilField
+    return (offset, integral, derivative)
 
 
+def pidLoop(controlAxis='y', fieldVals = None, function='dampen', timeLimit = None,
+			dampenLimits = [0.1, 0.1, 5], sumSignalLimit = 3.0):
 
-try:
-    while True:
-        # take the optical sensor readings from the labjack
-        sumSignal, leftMinusRight = xyz.ljm.eReadNames(handle, 2, ['AIN0', 'AIN1'])
-        if sumSignal > 3.0: # if we have a sum signal
-            pid(setpoint, leftMinusRight, handle) # run the pid loop
-        else:
-            print('sumSignal = %s' % sumSignal)
-            xyz.yCoil.supply.current(.9648)
-            input('Off sensor! (press enter when on sensor)')
-            dt = .001
-            integral = 0
-            derivative = 0
-            pid(setpoint, leftMinusRight, handle)
-            dt = .001
-            integral = 0
-            derivative = 0
-            pid(setpoint, leftMinusRight, handle)
+	# configure the analog register
+	# Setup and call eWriteNames to configure the AIN on the LabJack.
+	numFrames = 3
+	names = ["AIN0_NEGATIVE_CH", "AIN0_RANGE", "AIN0_RESOLUTION_INDEX"]
+	aValues = [199, 0, 10] # setup the analog register values for the labjack
+	xyz.ljm.eWriteNames(handle, numFrames, names, aValues)
 
-except KeyboardInterrupt:
-	time.sleep(.5)
-	print('\n')
-	xyz.closePorts(handle)
-	print('closed all the ports')
-	#print('Keyboard Interrupt') # print the exception
-	#raise
-except Exception as e:
-	# helpful to close the ports on except when debugging the code!
-	time.sleep(.5)
-	xyz.closePorts(handle)
-	print('closed all the ports')
-	print(e) # print the exception
-	raise
+	# global variables to be used by the pid loop
+	prePos = 0.0 #previous position
+	integral = 0.0
+	derivative = 0.0
+	t0 = time.time()
 
-# work in the optical zero space so we are always adusting perpenductular to the optical zero.
+	setpoint = 0.0
+	if fieldVals == None:
+		if controlAxis == 'y':
+			initialOutput = xyz.yCoil.coilField
 
-# each limit will need to be an equation for a line and the max and min values will need to be changesd based on the lineear range of that line.
+
+
+	try:
+	    while True:
+	        # take the optical sensor readings from the labjack
+	        sumSignal, leftMinusRight = xyz.ljm.eReadNames(handle, 2, ['AIN0', 'AIN1'])
+	        if sumSignal > sumSignalLimit: # if we have a sum signal
+	            offset, integral, derivative = pid(setpoint, leftMinusRight, handle, initialOutput) # run the pid loop
+				if function == 'dampen'
+					and abs(offset) <= dampenLimits[0]
+					and abs(derivative) <= dampenLimits[1]
+					and abs(integral) <=dampenLimits[2]:
+						return
+				elif function == 'timed' and time.time() - t0 >= timeLimit:
+						return
+
+	        else:
+	            print('sumSignal = %s' % sumSignal)
+	            xyz.yCoil.supply.current(.9648)
+	            input('Off sensor! (press enter when on sensor)')
+	            dt = .001
+	            integral = 0
+	            derivative = 0
+	            pid(setpoint, leftMinusRight, handle)
+	            dt = .001
+	            integral = 0
+	            derivative = 0
+	            pid(setpoint, leftMinusRight, handle)
+
+	except KeyboardInterrupt:
+		time.sleep(.5)
+		print('\n')
+		xyz.closePorts(handle)
+		print('closed all the ports')
+		#print('Keyboard Interrupt') # print the exception
+		#raise
+	except Exception as e:
+		# helpful to close the ports on except when debugging the code!
+		time.sleep(.5)
+		xyz.closePorts(handle)
+		print('closed all the ports')
+		print(e) # print the exception
+		raise
+
+	# work in the optical zero space so we are always adusting perpenductular to the optical zero.
+
+	# each limit will need to be an equation for a line and the max and min values will need to be changesd based on the lineear range of that line.

@@ -24,6 +24,8 @@ class Coil:
         self.largeCoilCurrent = self.supply.current() # Amps
         #print(self.largeCoilCurrent, type(self))
         self.largeCoilField = self.largeCoilCurrent * self.largeCoilFieldGain # total field
+        # research type casting later....
+        self.coilField = self.largeCoilField
 
         return
 
@@ -45,6 +47,17 @@ class Coil:
             #print('coil already set to %s' % self.largeCoilField)
 
         return
+
+    def getLargeCoilField(self):
+        """updates the internal field value.
+        Usefull for when the powersupply was adusted manually
+        and we want to read the new field value
+        """
+        self.largeCoilCurrent = self.supply.current() # query the current
+        # use the new current to update the field value:
+        self.largeCoilField = self.largeCoilCurrent * self.largeCoilFieldGain
+
+        return self.largeCoilField
 
 class CoilWithCorrection(Coil):
     """
