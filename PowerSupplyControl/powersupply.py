@@ -46,7 +46,7 @@ class PowerSupply():
             # messages always start with '\x13' so we can wait for that char and parse out the message
             if bufferByte == (b'\x13'): # if we are at the begining of a message,
                 bufferByte = self.ser.read() # read past the start bit
-                while bufferByte != (b'\x11') and bufferByte != (b'\r'): # while we are inside the message
+                while( (bufferByte != (b'\x11')) and (bufferByte != (b'\r')) ): # while we are inside the message
                     out += bufferByte
                     bufferByte = self.ser.read() # read the next byte
                 self.ser.reset_input_buffer() # clean out the input buffer after reading the message
