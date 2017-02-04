@@ -78,6 +78,8 @@ class PowerSupply():
         elif message == 'Out Of Range':
             #print('Input number out of range! (Likly too small. Minimum is 0.01V or 0.1mA)')
             raise Exception('Input number out of range! (Likly too small. Minimum is 0.01V or 0.1mA)')
+        elif: len(message) == 0:
+            raise Exception('no data receved from the powersupply on port %s' % self.portAddress)
         else:
             #print('strange message receved: %s' % message)
             raise Exception('strange message receved: %s' % message)

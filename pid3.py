@@ -79,6 +79,7 @@ try:
 		# querry the labjack
 		t1 = time.time()
 		sumSignal, leftMinusRight = xyz.ljm.eReadNames(handle, 2, ['AIN0', 'AIN1'])
+
 		# run the control loop
 		output = pid(setpoint, leftMinusRight)
 		outputYField += output*1e-6
