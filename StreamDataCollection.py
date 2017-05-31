@@ -63,6 +63,7 @@ def kickDown(xField, yField, zField):
 
 def StreamCollection(max_requests=60, bKick=True):
     #blahx;aksdjf;lak
+    #time = max_requests/scanRate
 
     MAX_REQUESTS = max_requests # The number of eStreamRead calls that will be performed.
     FIRST_AIN_CHANNEL = 0 #AIN0
