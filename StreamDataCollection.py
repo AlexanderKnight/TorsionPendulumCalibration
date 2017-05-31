@@ -61,11 +61,13 @@ def kickDown(xField, yField, zField):
 
 
 
-def StreamCollection(max_requests=60, bKick=True):
+def StreamCollection(time= 60, scanrate=1000, bKick=True):
     #blahx;aksdjf;lak
-    #time = max_requests/scanRate
+    #time = max_requests/scanRate in seconds
 
-    MAX_REQUESTS = max_requests # The number of eStreamRead calls that will be performed.
+    MAX_REQUESTS = int(time*scanRate)
+
+    #MAX_REQUESTS = max_requests # The number of eStreamRead calls that will be performed.
     FIRST_AIN_CHANNEL = 0 #AIN0
     NUMBER_OF_AINS = 3 # AIN0: L-R, AIN1: Sum, AIN2: T-B
 
@@ -85,7 +87,7 @@ def StreamCollection(max_requests=60, bKick=True):
     print("\nScan List = " + " ".join(aScanListNames))
     numAddresses = len(aScanListNames)
     aScanList = ljm.namesToAddresses(numAddresses, aScanListNames)[0]
-    scanRate = 1000
+    scanRate = scanrate
     scansPerRead = int(scanRate/2)
 
     try:
