@@ -3,10 +3,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from time import sleep
 
+
 def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
     '''
-    This function takes a pandas dataframe of period data and calculates the
-    period from the zero crossings, by event numbers.
+    This function takes a pandas dataframe of period data
+    ( or csv file as a string)
+    and calculates the period from the zero crossings, by event numbers.
 
     input: dataframe with columns=['eventNumber', 'sumSignal',
                                     'leftMinusRight', 'topMinusBotom',
@@ -28,6 +30,11 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
                 Allows for wandering data, as people tend to be better at picking
                 out bad wandering signals than computers.
     '''
+
+    # if given a csv file name, gets dataframe
+    if isinstance(data, str):
+        data = pd.read_csv(data)
+
     eventNumbers = data.eventNumber.unique() # checks for unique event numbers
 
     #set up for a couple of checks in the loop
@@ -67,8 +74,8 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
                                 13,000 (0 for all): '))
                     repeat = False
                 except:
-                    pass 
- 
+                    pass
+
                 if CropIndex == 0:
                     CropIndex = max(selectedData.index)+1
                     repeat = False
@@ -114,6 +121,7 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
         avgPeriod = np.mean(periods)
         stdPeriods = np.std(periods)
         numPeriods = len(periods)
+        print(periods)
 
         #if first time through loop (usually eventNumber = 0), sets up return
         #database
@@ -121,9 +129,10 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
 
             d = {'eventNumber':l, 'avgPeriod':avgPeriod,
                 'periodSTD': stdPeriods, 'numPeriods': numPeriods,
-                'xField':newdata.xField.mean(), 'yField':newdata.yField.mean()}
-            periodList = pd.DataFrame(d, index=[0])
-
+                'xField':newdata.xField.mean(), 'yField':newdata.yField.mean(),
+                 'periods':periods}
+            #periodList = pd.DataFrame(d, index=[0])
+            periodList = pd.DataFrame(d)
             first=False
 
         #adds to set up database from above
@@ -132,7 +141,8 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
             tempdf = pd.DataFrame({'eventNumber':l, 'avgPeriod':avgPeriod,
                                 'periodSTD':stdPeriods, 'numPeriods':numPeriods,
                                 'xField':newdata.xField.mean(),
-                                'yField':newdata.yField.mean()}, index=[0])
+                                'yField':newdata.yField.mean(),
+                                   'periods':periods})
             periodList= pd.concat([periodList,tempdf], ignore_index=True)
 
 
