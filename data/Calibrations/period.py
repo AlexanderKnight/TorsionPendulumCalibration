@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from sympy import symbols
+from sympy.plotting import textplot
 from time import sleep
 
 
@@ -59,15 +61,19 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
         if viewGraph:
             repeat = True
             while repeat:
+                CropIndex = 0
                 x = selectedData.index
                 y = selectedData.leftMinusRight
                 z = selectedData.sumSignal
-                plt.figure(figsize=(15,12))
-                plt.plot(x,y, 'o')
-                plt.plot(x,z, 'o')
-                plt.xlabel('Index')
-                plt.ylabel('Sum Signal and L-R Signal')
-                plt.show()
+                #plt.figure(figsize=(15,12))
+                #plt.plot(x,y, 'o')
+                #plt.plot(x,z, 'o')
+                #plt.xlabel('Index')
+                #plt.ylabel('Sum Signal and L-R Signal')
+                #plt.show()
+                #textplot(x,y,0,max(x))
+                #textplot(x,z,0,max(x))
+                '''
                 try:
                     CropIndex = 1000*int(input('Please enter the end index value \
                                 for analysis in thousands, \n e.g. 13 for index \
@@ -75,7 +81,7 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
                     repeat = False
                 except:
                     pass
-
+                '''
                 if CropIndex == 0:
                     CropIndex = max(selectedData.index)+1
                     repeat = False
