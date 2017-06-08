@@ -6,7 +6,7 @@ from sympy.plotting import textplot
 from time import sleep
 
 
-def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
+def periodCalc (data, swingCrop=None, viewGraph=True):
     '''
     This function takes a pandas dataframe of period data
     ( or csv file as a string)
@@ -61,19 +61,19 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
         if viewGraph:
             repeat = True
             while repeat:
-                CropIndex = 0
+                #CropIndex = 0
                 x = selectedData.index
                 y = selectedData.leftMinusRight
                 z = selectedData.sumSignal
-                #plt.figure(figsize=(15,12))
-                #plt.plot(x,y, 'o')
-                #plt.plot(x,z, 'o')
-                #plt.xlabel('Index')
-                #plt.ylabel('Sum Signal and L-R Signal')
-                #plt.show()
+                plt.figure(figsize=(15,12))
+                plt.plot(x,y, 'o')
+                plt.plot(x,z, 'o')
+                plt.xlabel('Index')
+                plt.ylabel('Sum Signal and L-R Signal')
+                plt.show()
                 #textplot(x,y,0,max(x))
                 #textplot(x,z,0,max(x))
-                '''
+
                 try:
                     CropIndex = 1000*int(input('Please enter the end index value \
                                 for analysis in thousands, \n e.g. 13 for index \
@@ -81,12 +81,15 @@ def periodCalc (data, sumCrop=4.5, swingCrop=None, viewGraph=True):
                     repeat = False
                 except:
                     pass
-                '''
+
                 if CropIndex == 0:
                     CropIndex = max(selectedData.index)+1
                     repeat = False
+        else:
+            CropIndex = 0
 
         #crops index
+        sumCrop = float(input('Lowest sum signal to count: '))
         selectedData = selectedData[selectedData.index <= CropIndex]
 
         crossingsIndex=[]

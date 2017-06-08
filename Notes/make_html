@@ -1,7 +1,6 @@
-
 #!/bin/bash
 
-for i in markdown/*.wiki;
+for i in markdown/*.md;
 do pandoc -f markdown -t html -s "$i" > "${i%.*}".html;
-mv markdown/*.html test/;
+mv markdown/*.html html/;
 done;

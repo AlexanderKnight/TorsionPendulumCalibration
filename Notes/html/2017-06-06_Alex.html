@@ -1,86 +1,13 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<link rel="Stylesheet" type="text/css" href="style.css">
-<title>2017-06-06_Alex</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
 </head>
 <body>
-
-<div id="2017-06-05 Alex"><h1 id="2017-06-05 Alex">2017-06-05 Alex</h1></div>
-
-<p>
-Centered sensor to pick up laser, so we can measure the period.
-</p>
-
-<p>
-Current time required to write to log is large, can we cut it down?
-Sets at "done with current querry!" for too long as it writes data to dataframe
-</p>
-
-
-
-<div id="2017-06-05 Alex-Can login to controlling computer with pendy@pendy.local"><h4 id="Can login to controlling computer with pendy@pendy.local">Can login to controlling computer with pendy@pendy.local</h4></div>
-
-<div id="2017-06-05 Alex-Torsion Constant Calculations"><h2 id="Torsion Constant Calculations">Torsion Constant Calculations</h2></div>
-
-<p>
-For the given apparatus, we can get the torsion constant by the equation
-</p>
-
-<p>
-\( \kappa = 4\pi^{2} \frac{I}{T^2} \)
-</p>
-
-<p>
-where:
-</p>
-<ul>
-<li>
-\( \kappa= \) torsion constant
-
-<li>
-\( I= \) Moment of inertia of system
-
-<li>
-\( T= \) Period
-
-</ul>
-
-<p>
-For the moment of inertia, we have three main parts:
-</p>
-<ul>
-<li>
-wire
-
-<li>
-mount
-
-<li>
-hoop
-
-</ul>
-
-<p>
-From these, the mount and hoop are relatively simple, since if they rotate, they will rotate entirely. The wire may be challenging, as the bottom attached to the mount will rotate entirely, but the top will not at all. For example:
-</p>
-
-<p>
-Suppose the pendulum sweeps through \(360^o\), then the hoop and the mount will rotate through \(360^o\), but the wire will have a gradiant of rotation, from \(360^o\) at the base to \(0^o\) at the top. If we assume a linear progression (\(360^o\) at bottom, \(180^o\) at middle, \(0^o\) at top), then can we approximate the fiber as a rigid rod of half the length? Couple of articles found seem to indicate that the effect is negligible enough to just approximate it as a rigid cylinder.
-</p>
-
-<p>
-<a href="..&#47;markdown&#47;Nelson85.pdf">The pendulum--Rich physics from a simple system ,R.A Nelson and M.G. Olsson</a>
-</p>
-
-<p>
-<a href="..&#47;markdown&#47;Montgomery78.pdf">Pendulum on a massive cord, C.G.Montgomery</a>
-</p>
-
-<p>
-<a href="..&#47;markdown&#47;Armstrong75.pdf">Effect of the mass of the cord on the period of a simple pendulum, H.L.Armstrong</a>
-</p>
-
+<h1 id="alex">2017-06-06 Alex</h1>
 </body>
 </html>

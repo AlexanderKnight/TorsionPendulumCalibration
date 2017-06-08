@@ -1,3 +1,0 @@
-= Torsion Pendulum Research Notes = 
-
-	* [[Daily Notes]] - Day to day notes and calculation
