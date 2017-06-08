@@ -1,0 +1,8 @@
+run             :2014-03-07-run-03
+pendulum        :Glass Disc & Al Loop
+micrometer      :6.65 mm
+runFile         :2014-03-07-run-03-Data.txt
+tmax            :60.0 sec
+res             :8
+setFactor       :5
+columnHeadings  :Time (S)   sumSignal  LR_Signal  TB_Signal'
