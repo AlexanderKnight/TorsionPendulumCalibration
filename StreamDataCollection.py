@@ -17,19 +17,9 @@ def package_my_data_into_a_dataframe_yay(data):
                               'topMinusBottom': data[:,2],
                               'xField': data[:,3],
                               'yField': data[:,4],
-                              'eventNumber': data[:,5]})
+                              'timestamp': data[:,5],
+                              'eventNumber': data[:,6]})
 
-
-    # append a time column that is calculated from the scan rate
-
-    # length
-    length = len(dataFrame.index)
-    time = []
-    for i in range(length):
-        timestamp = i * (1.0/scanRate)
-        time.append(timestamp)
-
-    dataFrame['timeStamp'] = time
 
     return dataFrame
 
@@ -61,9 +51,8 @@ def kickDown(xField, yField, zField):
 
 
 
-def StreamCollection(max_requests= 60, scanrate=1000, bKick=True):
-    #blahx;aksdjf;lak
-    #time will take about max_requests/2 in seconds 
+def StreamCollection(max_requests= 60, scanrate=1000, bKick=True, minSum=0.0):
+    #time will take about max_requests/2 in seconds
 
     MAX_REQUESTS = max_requests # The number of eStreamRead calls that will be performed.
     FIRST_AIN_CHANNEL = 0 #AIN0
@@ -85,7 +74,7 @@ def StreamCollection(max_requests= 60, scanrate=1000, bKick=True):
     print("\nScan List = " + " ".join(aScanListNames))
     numAddresses = len(aScanListNames)
     aScanList = ljm.namesToAddresses(numAddresses, aScanListNames)[0]
-    global scanRate 
+    global scanRate
     scanRate = scanrate
 
     scansPerRead = int(scanRate/2)
@@ -183,12 +172,14 @@ def StreamCollection(max_requests= 60, scanrate=1000, bKick=True):
 
             # format data to include field values
             rawDataWithFieldValues = []
-            for j, row in enumerate(rawData): # setp throuh and append the field values to each datapoint
-                rowWithFieldValues = np.append(row, np.array([xyz.xCoil.largeCoilField, xyz.yCoil.largeCoilField, eventNumber])) # for now we aren't using the adustment coils
-                if j > 0: # not on the first loop
-                    rawDataWithFieldValues = np.vstack((rawDataWithFieldValues, rowWithFieldValues))
-                else:
-                    rawDataWithFieldValues = rowWithFieldValues
+            for j, row in (rawData): # setp throuh and append the field values to each datapoint
+                if row[1] >= minSum:
+                    timestamp = j*(1.0/scanRate)
+                    rowWithFieldValues = np.append(row, np.array([xyz.xCoil.largeCoilField, xyz.yCoil.largeCoilField, timestamp, eventNumber])) # for now we aren't using the adustment coils
+                    if j > 0: # not on the first loop
+                        rawDataWithFieldValues = np.vstack((rawDataWithFieldValues, rowWithFieldValues))
+                    else:
+                        rawDataWithFieldValues = rowWithFieldValues
             print(np.shape(rawDataWithFieldValues))
 
             # and add it to our master data array
