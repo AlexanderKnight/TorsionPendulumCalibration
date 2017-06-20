@@ -51,7 +51,7 @@ def kickDown(xField, yField, zField):
 
 
 
-def StreamCollection(max_requests= 60, scanrate=1000, bKick=True, minSum=0.0):
+def StreamCollection(max_requests= 60, scanrate=1000, bKick=True, minSum=-1.0):
     #time will take about max_requests/2 in seconds
 
     MAX_REQUESTS = max_requests # The number of eStreamRead calls that will be performed.
@@ -172,14 +172,18 @@ def StreamCollection(max_requests= 60, scanrate=1000, bKick=True, minSum=0.0):
 
             # format data to include field values
             rawDataWithFieldValues = []
-            for j, row in (rawData): # setp throuh and append the field values to each datapoint
+            print(rawData)
+            first = True
+            for j, row in enumerate(rawData): # setp throuh and append the field values to each datapoint
                 if row[1] >= minSum:
                     timestamp = j*(1.0/scanRate)
                     rowWithFieldValues = np.append(row, np.array([xyz.xCoil.largeCoilField, xyz.yCoil.largeCoilField, timestamp, eventNumber])) # for now we aren't using the adustment coils
-                    if j > 0: # not on the first loop
-                        rawDataWithFieldValues = np.vstack((rawDataWithFieldValues, rowWithFieldValues))
-                    else:
+                    if first:
+                        first = False
                         rawDataWithFieldValues = rowWithFieldValues
+
+                    else: # not on the first loop
+                        rawDataWithFieldValues = np.vstack((rawDataWithFieldValues, rowWithFieldValues))
             print(np.shape(rawDataWithFieldValues))
 
             # and add it to our master data array
