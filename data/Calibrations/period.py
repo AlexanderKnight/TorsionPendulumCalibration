@@ -6,7 +6,8 @@ from sympy.plotting import textplot
 from time import sleep
 
 
-def periodCalc (data, swingCrop=None, viewGraph=True):
+def periodCalc (data, swingCrop=None, viewGraph=True,
+                minPeriod=0.1, saveData=False, saveName=None):
     '''
     This function takes a pandas dataframe of period data
     ( or csv file as a string)
@@ -14,7 +15,7 @@ def periodCalc (data, swingCrop=None, viewGraph=True):
 
     input: dataframe with columns=['eventNumber', 'sumSignal',
                                     'leftMinusRight', 'topMinusBotom',
-                                    'xField', 'yField', 'timeStamp']
+                                    'xField', 'yField', 'timestamp']
     output: dataframe with columns=['eventNumber', 'avgPeriod',
                                     'xField', 'yField']
 
@@ -61,8 +62,14 @@ def periodCalc (data, swingCrop=None, viewGraph=True):
         if viewGraph:
             repeat = True
             while repeat:
+                print('You will be shown a graph of the Sum and Left-Right \
+                      signal. Please note the the last index that should \
+                      be counted, and the minimum Sum signal that should be \
+                      included. You will need to input these after the graph\
+                      is shown and closed')
+                input("Press Enter to show plot...")
                 #CropIndex = 0
-                x = selectedData.index
+                x = selectedData.timestamp
                 y = selectedData.leftMinusRight
                 z = selectedData.sumSignal
                 plt.figure(figsize=(15,12))
@@ -78,6 +85,7 @@ def periodCalc (data, swingCrop=None, viewGraph=True):
                     CropIndex = 1000*int(input('Please enter the end index value \
                                 for analysis in thousands, \n e.g. 13 for index \
                                 13,000 (0 for all): '))
+                    sumCrop = float(input('Lowest sum signal to count: '))
                     repeat = False
                 except:
                     pass
@@ -86,10 +94,10 @@ def periodCalc (data, swingCrop=None, viewGraph=True):
                     CropIndex = max(selectedData.index)+1
                     repeat = False
         else:
-            CropIndex = 0
+            CropIndex = max(selectedData.index)+1
+            sumCrop = -99999
 
         #crops index
-        sumCrop = float(input('Lowest sum signal to count: '))
         selectedData = selectedData[selectedData.index <= CropIndex]
 
         crossingsIndex=[]
@@ -122,9 +130,15 @@ def periodCalc (data, swingCrop=None, viewGraph=True):
         newdata = newdata.reset_index()
 
         #gets periods of crossings
+        tempPeriods = []
         periods = []
+
         for i in range(2, len(newdata.index)):
-            periods.append(newdata.timeStamp[i]-newdata.timeStamp[i-2])
+            tempPeriods.append(newdata.timestamp[i]-newdata.timestamp[i-2])
+
+        for period in tempPeriods:
+            if period > minPeriod:
+                periods.append(period)
 
         #gets average period
         avgPeriod = np.mean(periods)
@@ -153,6 +167,12 @@ def periodCalc (data, swingCrop=None, viewGraph=True):
                                 'yField':newdata.yField.mean(),
                                    'periods':periods})
             periodList= pd.concat([periodList,tempdf], ignore_index=True)
+
+    if saveData:
+        if saveName == None:
+            saveName = str(input('Please give a name for the period data to \
+                                 be saved out as. No spaces in name'))
+        periodList.to_csv(saveName+'.csv')
 
 
     return periodList
